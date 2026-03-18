@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { AppStorys, Banner } from '@appstorys/react-web'
+import { AppStorys, Banner, Story } from '@appstorys/react-web'
 import Floater from '../../../src/components/Floater';
 import './App.css'
 import fetchAllCampaigns from '../../../src/core/fetchAllCampaigns';
@@ -38,8 +38,9 @@ function App() {
   return (
     <div className="App">
       <h1>AppStorys Web SDK Demo</h1>
-      <p>The banner should appear below if a campaign is active for '{DEMO_SCREEN_NAME}' screen.</p>
+      <p>The banner shouldn't appear below if a campaign is active for '{DEMO_SCREEN_NAME}' screen.</p>
 
+      <Story />
       <Banner />
       <Floater />
 
