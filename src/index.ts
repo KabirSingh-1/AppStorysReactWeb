@@ -1,5 +1,6 @@
 import { SdkState, InitializationOptions, Attributes } from './types';
 import { Banner } from './components/Banner';
+import { Pip } from './components/Pip';
 import trackEvent from './core/trackEvent';
 import trackScreen from './core/trackScreen';
 import verifyAccount from './core/verifyAccount';
@@ -152,5 +153,5 @@ class AppStorys {
 import { Story } from './components/Story';
 
 const instance = new AppStorys();
-export { instance as AppStorys, Banner, Story, personalizeText };
+export { instance as AppStorys, Banner, Story, Pip, personalizeText };
 export * from './types';

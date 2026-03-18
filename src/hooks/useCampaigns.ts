@@ -9,6 +9,16 @@ interface UseCampaignsOptions {
   position?: string;
 }
 
+function normalizeScreenName(screen?: string | null): string {
+  return (screen || '').trim().toLowerCase();
+}
+
+function isScreenMatch(campaignScreen: string | undefined, currentScreen: string): boolean {
+  const normalizedCampaignScreen = normalizeScreenName(campaignScreen);
+  const normalizedCurrentScreen = normalizeScreenName(currentScreen);
+  return !normalizedCampaignScreen || normalizedCampaignScreen === normalizedCurrentScreen;
+}
+
 function compareValues(actual: string, operator: TriggerEventConfig['operator'], expected: string): boolean {
   const numActual = Number(actual);
   const numExpected = Number(expected);
@@ -101,22 +111,26 @@ export function isBackPressCampaignReady(): boolean {
 export default function useCampaigns<T extends Campaign>(campaignType: string, options?: UseCampaignsOptions): T | undefined {
   const currentScreen = useAppStorysStore((state) => state.currentScreen);
   const campaigns = useAppStorysStore((state) => state.campaigns);
+  const allCampaigns = useAppStorysStore((state) => state.allCampaigns);
   const trackedEvents = useAppStorysStore((state) => state.trackedEvents);
   const trackedEventMetadata = useAppStorysStore((state) => state.trackedEventMetadata);
   const variantMappings = useAppStorysStore((state) => state.variantMappings);
 
   return useMemo(
     () => {
-      const campaign = campaigns?.find((campaign) =>
-        campaign.screen === currentScreen &&
+      const matchCampaign = (list: Campaign[]) => list.find((campaign) =>
+        isScreenMatch(campaign.screen, currentScreen) &&
         campaign.campaign_type === campaignType &&
         (options?.position ? campaign.position === options.position : true) &&
         isTriggerEventSatisfied(campaign, trackedEvents, trackedEventMetadata)
       );
 
+      const fromEligible = campaigns && campaigns.length > 0 ? matchCampaign(campaigns) : undefined;
+      const campaign = fromEligible ?? matchCampaign(allCampaigns || []);
+
       if (!campaign) return undefined;
       return resolveCampaignVariant(campaign) as T | undefined;
     },
-    [campaigns, trackedEvents, trackedEventMetadata, variantMappings, campaignType, options, currentScreen],
+    [campaigns, allCampaigns, trackedEvents, trackedEventMetadata, variantMappings, campaignType, options, currentScreen],
   );
 }

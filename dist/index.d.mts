@@ -204,6 +204,8 @@ interface InitializationOptions {
 
 declare const Banner: React.FC;
 
+declare const Pip: React.FC;
+
 declare function personalizeText(text: string): string;
 
 declare const Story: React.FC;
