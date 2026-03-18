@@ -101,7 +101,115 @@ export interface AppStorysStore {
   trackingUrl?: string;
 }
 
-export type Campaign = CampaignBanner | BaseCampaign;
+export interface StorySlideCtaContainer {
+  alignment?: string;
+  backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  ctaFullWidth?: boolean;
+  ctaWidth?: number;
+  height?: number;
+}
+
+export interface StorySlideCtaText {
+  color?: string;
+  fontDecoration?: string[];
+  fontFamily?: string;
+  fontSize?: number;
+}
+
+export interface StorySlideCta {
+  container?: StorySlideCtaContainer;
+  cornerRadius?: StorySlideCtaBorderRadius;
+  margin?: {
+    bottom?: number;
+    left?: number;
+    right?: number;
+    top?: number;
+  };
+  text?: StorySlideCtaText;
+}
+
+export interface StorySlideStyling {
+  cta?: StorySlideCta;
+  meta?: {
+    editorSource?: string;
+  };
+  pc_redirect_type?: string;
+  rdrType?: string;
+}
+
+export interface StorySlide {
+  button_text?: string;
+  content?: any;
+  id: string;
+  image: string | null;
+  link: string | null;
+  order: number;
+  parent: string;
+  personalizationData?: any;
+  styling?: StorySlideStyling;
+  video: string | null;
+}
+
+export interface StoryGroupStyling {
+  cornerRadius?: {
+    bottomLeft?: number;
+    bottomRight?: number;
+    topLeft?: number;
+    topRight?: number;
+  };
+  crossButton?: CrossButtonConfig;
+  name?: {
+    font?: string;
+    fontFamily?: string;
+    size?: number;
+  };
+  ringWidth?: number;
+  share?: {
+    color?: {
+      cross?: string;
+      fill?: string;
+      stroke?: string;
+    };
+    enabled?: boolean;
+    image?: string;
+    margin?: {
+      right?: number;
+      top?: number;
+    };
+    selectedStyle?: string;
+    size?: number;
+  };
+  size?: number;
+  slideShowTime?: number;
+  soundToggle?: {
+    defaultSound?: string;
+    enabled?: boolean;
+    mute?: any;
+    unmute?: any;
+  };
+  storyGroupText?: string;
+}
+
+export interface Story {
+  cohorts: any;
+  id: string;
+  name: string;
+  nameColor: string;
+  order: number;
+  ringColor: string;
+  slides: StorySlide[];
+  styling?: StoryGroupStyling;
+  thumbnail: string;
+}
+
+export interface CampaignStory extends BaseCampaign {
+  campaign_type: 'STR';
+  details: Story[];
+}
+
+export type Campaign = CampaignBanner | CampaignStory | BaseCampaign;
 
 export interface InitializationOptions {
   appId: string;

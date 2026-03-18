@@ -92,7 +92,107 @@ interface AppStorysStore {
     baseUrl?: string;
     trackingUrl?: string;
 }
-type Campaign = CampaignBanner | BaseCampaign;
+interface StorySlideCtaContainer {
+    alignment?: string;
+    backgroundColor?: string;
+    borderColor?: string;
+    borderWidth?: number;
+    ctaFullWidth?: boolean;
+    ctaWidth?: number;
+    height?: number;
+}
+interface StorySlideCtaText {
+    color?: string;
+    fontDecoration?: string[];
+    fontFamily?: string;
+    fontSize?: number;
+}
+interface StorySlideCta {
+    container?: StorySlideCtaContainer;
+    cornerRadius?: StorySlideCtaBorderRadius;
+    margin?: {
+        bottom?: number;
+        left?: number;
+        right?: number;
+        top?: number;
+    };
+    text?: StorySlideCtaText;
+}
+interface StorySlideStyling {
+    cta?: StorySlideCta;
+    meta?: {
+        editorSource?: string;
+    };
+    pc_redirect_type?: string;
+    rdrType?: string;
+}
+interface StorySlide {
+    button_text?: string;
+    content?: any;
+    id: string;
+    image: string | null;
+    link: string | null;
+    order: number;
+    parent: string;
+    personalizationData?: any;
+    styling?: StorySlideStyling;
+    video: string | null;
+}
+interface StoryGroupStyling {
+    cornerRadius?: {
+        bottomLeft?: number;
+        bottomRight?: number;
+        topLeft?: number;
+        topRight?: number;
+    };
+    crossButton?: CrossButtonConfig;
+    name?: {
+        font?: string;
+        fontFamily?: string;
+        size?: number;
+    };
+    ringWidth?: number;
+    share?: {
+        color?: {
+            cross?: string;
+            fill?: string;
+            stroke?: string;
+        };
+        enabled?: boolean;
+        image?: string;
+        margin?: {
+            right?: number;
+            top?: number;
+        };
+        selectedStyle?: string;
+        size?: number;
+    };
+    size?: number;
+    slideShowTime?: number;
+    soundToggle?: {
+        defaultSound?: string;
+        enabled?: boolean;
+        mute?: any;
+        unmute?: any;
+    };
+    storyGroupText?: string;
+}
+interface Story$1 {
+    cohorts: any;
+    id: string;
+    name: string;
+    nameColor: string;
+    order: number;
+    ringColor: string;
+    slides: StorySlide[];
+    styling?: StoryGroupStyling;
+    thumbnail: string;
+}
+interface CampaignStory extends BaseCampaign {
+    campaign_type: 'STR';
+    details: Story$1[];
+}
+type Campaign = CampaignBanner | CampaignStory | BaseCampaign;
 interface InitializationOptions {
     appId: string;
     accountId: string;
@@ -107,6 +207,8 @@ declare const Banner: React.FC;
 declare const Pip: React.FC;
 
 declare function personalizeText(text: string): string;
+
+declare const Story: React.FC;
 
 declare class AppStorys {
     private state;
@@ -130,6 +232,7 @@ declare class AppStorys {
     private ensureInitialized;
     personalizeText(text: string): string;
 }
+
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignType, type CrossButtonConfig, type InitializationOptions, Pip, SdkState, type StorySlideCtaBorderRadius, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignType, type CrossButtonConfig, type InitializationOptions, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, personalizeText };
