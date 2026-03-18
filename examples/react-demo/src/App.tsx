@@ -1,9 +1,6 @@
 import { useEffect } from 'react'
-import { AppStorys, Banner } from '@appstorys/react-web'
-import Floater from '../../../src/components/Floater';
+import { AppStorys, Banner, Pip } from '@appstorys/react-web'
 import './App.css'
-import fetchAllCampaigns from '../../../src/core/fetchAllCampaigns';
-import useAppStorysStore from '../../../src/core/store';
 
 function App() {
   const DEMO_SCREEN_NAME = 'Home Screen';
@@ -12,10 +9,6 @@ function App() {
     const initSDK = async () => {
       try {
         console.log('[App] Initializing AppStorys SDK...');
-        // Fetch and store all campaigns before initializing SDK
-        const { campaigns } = await fetchAllCampaigns('12a9eac5-94ee-4735-9aa6-b8a94cb8fbbb');
-        useAppStorysStore.getState().saveAllCampaigns(campaigns);
-        console.log('[App] All campaigns fetched and saved:', campaigns);
         await AppStorys.initialize({
           appId: 'f69bdccf-b20f-4938-b39e-7075d76db791',
           accountId: '12a9eac5-94ee-4735-9aa6-b8a94cb8fbbb',
@@ -41,7 +34,7 @@ function App() {
       <p>The banner should appear below if a campaign is active for '{DEMO_SCREEN_NAME}' screen.</p>
 
       <Banner />
-      <Floater />
+      <Pip />
 
       <div className="card">
         <button onClick={() => AppStorys.trackEvent('button_click')}>

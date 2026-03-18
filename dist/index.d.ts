@@ -104,6 +104,8 @@ interface InitializationOptions {
 
 declare const Banner: React.FC;
 
+declare const Pip: React.FC;
+
 declare function personalizeText(text: string): string;
 
 declare class AppStorys {
@@ -130,4 +132,4 @@ declare class AppStorys {
 }
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignType, type CrossButtonConfig, type InitializationOptions, SdkState, type StorySlideCtaBorderRadius, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignType, type CrossButtonConfig, type InitializationOptions, Pip, SdkState, type StorySlideCtaBorderRadius, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, personalizeText };
