@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { AppStorys, Banner, Story } from '@appstorys/react-web'
+import { AppStorys, Banner, Story, Widget } from '@appstorys/react-web'
 import Floater from '../../../src/components/Floater';
 import './App.css'
 import fetchAllCampaigns from '../../../src/core/fetchAllCampaigns';
@@ -42,6 +42,7 @@ function App() {
 
       <Story />
       <Banner />
+      <Widget />
       <Floater />
 
       <div className="card">
