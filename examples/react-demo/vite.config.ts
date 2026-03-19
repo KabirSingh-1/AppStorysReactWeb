@@ -31,6 +31,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/appstorys-campaigns/, ''),
         secure: false,
+      },
+      '/appstorys-media': {
+        target: 'https://appstorysmediabucketdev.s3.ap-south-1.amazonaws.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/appstorys-media/, ''),
+        secure: false,
       }
     }
   }

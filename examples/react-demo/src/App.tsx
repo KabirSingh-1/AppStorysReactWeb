@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import { AppStorys, Banner, Story, Widget, Pip } from '@appstorys/react-web'
-import Floater from '../../../src/components/Floater';
+import { AppStorys, Banner, Story, Widget, Pip, Floater } from '@appstorys/react-web'
 import './App.css'
 
 function App() {
