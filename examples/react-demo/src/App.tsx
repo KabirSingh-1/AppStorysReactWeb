@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { AppStorys, Banner, Story , Pip} from '@appstorys/react-web'
+import { AppStorys, Banner, Story, Widget, Pip } from '@appstorys/react-web'
+import Floater from '../../../src/components/Floater';
 import './App.css'
 
 function App() {
@@ -35,7 +36,9 @@ function App() {
 
       <Story />
       <Banner />
+      <Widget />
       <Pip />
+      <Floater />
 
       <div className="card">
         <button onClick={() => AppStorys.trackEvent('button_click')}>

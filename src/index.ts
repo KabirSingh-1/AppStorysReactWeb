@@ -151,7 +151,8 @@ class AppStorys {
 }
 
 import { Story } from './components/Story';
+import { Widget } from './components/Widget';
 
 const instance = new AppStorys();
-export { instance as AppStorys, Banner, Story, Pip, personalizeText };
+export { instance as AppStorys, Banner, Story, Pip, Widget, personalizeText };
 export * from './types';

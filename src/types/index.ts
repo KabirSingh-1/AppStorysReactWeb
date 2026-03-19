@@ -209,7 +209,38 @@ export interface CampaignStory extends BaseCampaign {
   details: Story[];
 }
 
-export type Campaign = CampaignBanner | CampaignStory | BaseCampaign;
+export interface WidgetImage {
+  cohorts: any;
+  id: string;
+  image: string;
+  link: string;
+  order: number;
+}
+
+export interface CampaignWidget extends BaseCampaign {
+  campaign_type: 'WID';
+  details: {
+    height: number;
+    id: string;
+    styling: {
+      borderRadius: number;
+      bottomLeftRadius: number;
+      bottomMargin: number;
+      bottomRightRadius: number;
+      leftMargin: number;
+      rightMargin: number;
+      topLeftRadius: number;
+      topMargin: number;
+      topRightRadius: number;
+      type: string;
+    };
+    widget_images: WidgetImage[];
+    width: number;
+    type?: string;
+  };
+}
+
+export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | BaseCampaign;
 
 export interface InitializationOptions {
   appId: string;

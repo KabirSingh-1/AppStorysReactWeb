@@ -192,7 +192,36 @@ interface CampaignStory extends BaseCampaign {
     campaign_type: 'STR';
     details: Story$1[];
 }
-type Campaign = CampaignBanner | CampaignStory | BaseCampaign;
+interface WidgetImage {
+    cohorts: any;
+    id: string;
+    image: string;
+    link: string;
+    order: number;
+}
+interface CampaignWidget extends BaseCampaign {
+    campaign_type: 'WID';
+    details: {
+        height: number;
+        id: string;
+        styling: {
+            borderRadius: number;
+            bottomLeftRadius: number;
+            bottomMargin: number;
+            bottomRightRadius: number;
+            leftMargin: number;
+            rightMargin: number;
+            topLeftRadius: number;
+            topMargin: number;
+            topRightRadius: number;
+            type: string;
+        };
+        widget_images: WidgetImage[];
+        width: number;
+        type?: string;
+    };
+}
+type Campaign = CampaignBanner | CampaignStory | CampaignWidget | BaseCampaign;
 interface InitializationOptions {
     appId: string;
     accountId: string;
@@ -209,6 +238,8 @@ declare const Pip: React.FC;
 declare function personalizeText(text: string): string;
 
 declare const Story: React.FC;
+
+declare const Widget: React.FC;
 
 declare class AppStorys {
     private state;
@@ -235,4 +266,4 @@ declare class AppStorys {
 
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignType, type CrossButtonConfig, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignType, type CampaignWidget, type CrossButtonConfig, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
