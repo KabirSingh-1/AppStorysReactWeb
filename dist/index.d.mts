@@ -235,6 +235,8 @@ declare const Banner: React.FC;
 
 declare const Pip: React.FC;
 
+declare const Floater: React.FC;
+
 declare function personalizeText(text: string): string;
 
 declare const Story: React.FC;
@@ -266,4 +268,4 @@ declare class AppStorys {
 
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignType, type CampaignWidget, type CrossButtonConfig, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignType, type CampaignWidget, type CrossButtonConfig, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
