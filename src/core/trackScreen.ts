@@ -1,6 +1,16 @@
 import useAppStorysStore, { getAccessToken, getUserId } from "./store";
 import { Campaign } from "../types";
 
+function normalizeScreenName(screen?: string | null): string {
+  return (screen || "").trim().toLowerCase();
+}
+
+function isScreenMatch(campaign: Campaign, screenName: string): boolean {
+  const campaignScreen = normalizeScreenName(campaign.screen);
+  const currentScreen = normalizeScreenName(screenName);
+  return !campaignScreen || campaignScreen === currentScreen;
+}
+
 export default async function trackScreen(screenName: string) {
   try {
     const state = useAppStorysStore.getState();
@@ -50,7 +60,7 @@ export default async function trackScreen(screenName: string) {
 
     const foundCampaigns = allCampaigns.filter(campaign =>
       eligibleCampaignIds.includes(campaign.id!) &&
-      (campaign.screen === screenName || !campaign.screen)
+      isScreenMatch(campaign, screenName)
     );
 
     // Fetch missing campaigns if necessary
@@ -71,15 +81,29 @@ export default async function trackScreen(screenName: string) {
       if (fallbackResponse.ok) {
         const fallbackData = await fallbackResponse.json();
         missingCampaigns = fallbackData.filter((campaign: Campaign) =>
-          campaign.screen === screenName || !campaign.screen
+          isScreenMatch(campaign, screenName)
         );
       }
     }
 
     const eligibleCampaigns = [...foundCampaigns, ...missingCampaigns];
-    if (eligibleCampaigns.length > 0) {
-      state.saveCampaigns(eligibleCampaigns);
+
+    // Keep display-trigger campaigns available even when eligibility API is partial.
+    const displayTriggeredCampaigns = allCampaigns.filter((campaign: Campaign & { display_trigger?: boolean }) =>
+      isScreenMatch(campaign, screenName) && campaign.display_trigger === true
+    );
+
+    const mergedCampaigns = [...eligibleCampaigns];
+    const seenCampaignIds = new Set(mergedCampaigns.map((campaign) => campaign.id));
+
+    for (const campaign of displayTriggeredCampaigns) {
+      if (!seenCampaignIds.has(campaign.id)) {
+        mergedCampaigns.push(campaign);
+        seenCampaignIds.add(campaign.id);
+      }
     }
+
+    state.saveCampaigns(mergedCampaigns);
   } catch (error) {
     console.error('Error when tracking screen:', screenName, error);
   }
