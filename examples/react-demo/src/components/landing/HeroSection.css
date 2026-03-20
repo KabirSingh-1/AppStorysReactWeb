@@ -1,0 +1,116 @@
+.landing-hero {
+  width: 100%;
+  background: #fff7f3;
+  padding: 40px 16px;
+}
+
+.landing-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.landing-hero-title {
+  margin: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.landing-hero-title-static {
+  color: #000;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 700;
+}
+
+.landing-hero-title-dynamic-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.landing-hero-title-dynamic {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(48px, 10vw, 112px);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing-hero-title-measure {
+  visibility: hidden;
+  font-size: clamp(48px, 10vw, 112px);
+  font-weight: 700;
+}
+
+.landing-hero-subtitle {
+  margin-top: 24px;
+  color: #000;
+  text-align: center;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 500;
+}
+
+.landing-hero-lotties {
+  margin-top: 24px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.landing-hero-lottie-item {
+  min-height: 120px;
+}
+
+.landing-hero-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.landing-hero-watch {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.landing-hero-cta {
+  width: 200px;
+  height: 58px;
+  border: 2px solid #fd5f03;
+  background: #fd5f03;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .landing-hero {
+    padding: 40px 20px;
+  }
+
+  .landing-hero-subtitle {
+    margin-top: 56px;
+  }
+
+  .landing-hero-lotties {
+    margin-top: 36px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .landing-hero-actions {
+    margin-top: 32px;
+    flex-direction: row;
+    gap: 14px;
+  }
+}

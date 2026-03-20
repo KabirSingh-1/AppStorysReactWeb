@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Lottie from 'lottie-react';
+import * as LottieModule from 'lottie-react';
 import { CampaignBanner } from '../../types';
 import useAppStorysStore from '../../core/store';
 import useCampaigns from '../../hooks/useCampaigns';
 import trackEvent from '../../core/trackEvent';
+
+const Lottie =
+  (LottieModule as any).default?.default ??
+  (LottieModule as any).default ??
+  (LottieModule as any).Lottie ??
+  (LottieModule as any);
 
 export const Banner: React.FC = () => {
   const data = useCampaigns<CampaignBanner>('BAN');
