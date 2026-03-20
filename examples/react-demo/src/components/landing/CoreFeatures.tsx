@@ -191,8 +191,10 @@ const features: Feature[] = [
 ];
 
 function FeatureCard({ feature }: { feature: Feature }) {
+  const isTarget = feature.id === 1; // target the first feature for tooltips
+
   return (
-    <div className="core-feature-card">
+    <div className="core-feature-card" id={isTarget ? "information-card" : undefined}>
       <div className="core-feature-image-wrap">
         <div className="core-feature-number">{feature.id}</div>
         <div className="core-feature-image-box">
@@ -200,8 +202,8 @@ function FeatureCard({ feature }: { feature: Feature }) {
         </div>
       </div>
 
-      <h3 className="core-feature-title">{feature.title}</h3>
-      <p className="core-feature-description">{feature.description}</p>
+      <h3 className="core-feature-title" id={isTarget ? "card-title" : undefined}>{feature.title}</h3>
+      <p className="core-feature-description" id={isTarget ? "card-description" : undefined}>{feature.description}</p>
 
       <div className="core-feature-metrics">
         {feature.metrics.map((metric) => (
@@ -214,6 +216,7 @@ function FeatureCard({ feature }: { feature: Feature }) {
     </div>
   );
 }
+
 
 export default function CoreFeatures() {
   const [currentIndex, setCurrentIndex] = useState(0);

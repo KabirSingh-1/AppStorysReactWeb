@@ -33,6 +33,7 @@ const Cta: React.FC<CtaProps> = ({ cta, buttonText, onPress }) => {
                 width: '100%',
                 pointerEvents: 'none',
                 boxSizing: 'border-box',
+                zIndex: 10,
             }}
         >
             <button

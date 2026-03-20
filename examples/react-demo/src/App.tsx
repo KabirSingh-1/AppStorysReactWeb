@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import * as AppStorysSDK from '@appstorys/react-web'
 import HeroSection from './components/landing/HeroSection'
 import CoreFeatures from './components/landing/CoreFeatures'
@@ -14,6 +14,7 @@ import BlogSection from './components/landing/BlogSection'
 import TopBanner from './components/shell/TopBanner'
 import Header from './components/shell/Header'
 import Footer from './components/shell/Footer'
+import TooltipCanvas from './components/TooltipCanvas'
 import './App.css'
 
 const AppStorys = (AppStorysSDK as any).AppStorys;
@@ -29,9 +30,15 @@ const PipComponent =
 const FloaterComponent =
   (AppStorysSDK as any).Floater?.default ??
   (AppStorysSDK as any).Floater;
+const TooltipComponent =
+  (AppStorysSDK as any).Tooltip?.default ??
+  (AppStorysSDK as any).Tooltip;
+
 
 function App() {
+  const [showTooltipDashboard, setShowTooltipDashboard] = useState(false);
   const DEMO_SCREEN_NAME = 'Home Screen';
+  const DASHBOARD_SCREEN_NAME = 'Dashboard';
 
   useEffect(() => {
     const initSDK = async () => {
@@ -46,15 +53,27 @@ function App() {
             console.log('[App] Navigating to screen:', screen);
           }
         });
-        console.log('[App] AppStorys SDK initialized. Tracking screen:', DEMO_SCREEN_NAME);
-        await AppStorys.trackScreen(DEMO_SCREEN_NAME);
-        console.log('[App] Screen tracked:', DEMO_SCREEN_NAME);
+        const currentTracking = showTooltipDashboard ? DASHBOARD_SCREEN_NAME : DEMO_SCREEN_NAME;
+        console.log('[App] AppStorys SDK initialized. Tracking screen:', currentTracking);
+        await AppStorys.trackScreen(currentTracking);
       } catch (error) {
         console.error('Failed to init SDK:', error);
       }
     };
     initSDK();
-  }, []);
+  }, [showTooltipDashboard]);
+
+  const toggleDashboard = async () => {
+    const newState = !showTooltipDashboard;
+    setShowTooltipDashboard(newState);
+    const trackingScreen = newState ? DASHBOARD_SCREEN_NAME : DEMO_SCREEN_NAME;
+    try {
+      await AppStorys.trackScreen(trackingScreen);
+      console.log('[App] Screen tracked via toggle:', trackingScreen);
+    } catch (e) {
+      console.error('[App] Failed to track screen via toggle:', e);
+    }
+  };
 
   return (
     <div className="app-landing-root">
@@ -62,24 +81,55 @@ function App() {
       <Header />
       {StoryComponent ? <StoryComponent /> : null}
       {BannerComponent ? <BannerComponent /> : null}
+      
       <main>
-        <HeroSection />
-        <CoreFeatures />
-        <HyperPersonalization />
-        <SetupGoals />
-        <FrequencyAndScheduling />
-        <WhyUs />
-        <Integrations />
-        <Sdks />
-        <Testimonials />
-        <TrustSection />
-        <BlogSection />
+        {showTooltipDashboard ? (
+          <TooltipCanvas />
+        ) : (
+          <>
+            <HeroSection />
+            <CoreFeatures />
+            <HyperPersonalization />
+            <SetupGoals />
+            <FrequencyAndScheduling />
+            <WhyUs />
+            <Integrations />
+            <Sdks />
+            <Testimonials />
+            <TrustSection />
+            <BlogSection />
+          </>
+        )}
       </main>
+
       {PipComponent ? <PipComponent /> : null}
       {FloaterComponent ? <FloaterComponent /> : null}
+      {TooltipComponent ? <TooltipComponent /> : null}
       <Footer />
+
+      {/* Toggle Button */}
+      <button 
+        onClick={toggleDashboard}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 99999,
+          padding: '12px 20px',
+          backgroundColor: '#FE6B35',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '25px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}
+      >
+        {showTooltipDashboard ? 'View Landing Page' : 'View Tooltip Dashboard'}
+      </button>
     </div>
   )
 }
 
 export default App
+

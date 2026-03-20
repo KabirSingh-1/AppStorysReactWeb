@@ -41,6 +41,19 @@ export default function HyperPersonalization() {
             videos, or banners to each user group helping you boost engagement and conversions
             without any manual work.
           </p>
+
+          {/* Interactive Tag Setup for Tooltip Mapping */}
+          <div className="hyper-personalization-tags" id="tags-wrapper">
+            <span className="sc-tag red-tag" id="red-tag">
+              <span id="red-tag-text">🔴 Critical</span>
+            </span>
+            <span className="sc-tag teal-tag" id="teal-tag">
+              <span id="teal-tag-text">🟢 Active</span>
+            </span>
+            <span className="sc-tag blue-tag" id="blue-tag">
+              <span id="blue-tag-text">🔵 Dynamic</span>
+            </span>
+          </div>
         </div>
 
         <div className="hyper-personalization-visual-wrap" data-animated="true">
