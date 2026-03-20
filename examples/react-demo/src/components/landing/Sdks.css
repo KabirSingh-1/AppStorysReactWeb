@@ -1,0 +1,66 @@
+.sdks {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  padding: 64px 16px;
+}
+
+.sdks-inner {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.sdks-header {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.sdks-kicker {
+  margin: 0 0 8px;
+  font-size: 26px;
+}
+
+.sdks-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(30px, 5.4vw, 56px);
+  font-weight: 500;
+  line-height: 1.02;
+}
+
+.sdks-header p {
+  margin: 20px auto 0;
+  max-width: 430px;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.28;
+}
+
+.sdks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.sdks-card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.sdks-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .sdks-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
