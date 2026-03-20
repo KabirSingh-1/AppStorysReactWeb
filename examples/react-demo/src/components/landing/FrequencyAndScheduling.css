@@ -1,0 +1,78 @@
+.frequency-scheduling {
+  width: 100%;
+  background: #fff8f5;
+  margin-bottom: -80px;
+  display: flex;
+  justify-content: center;
+}
+
+.frequency-scheduling-inner {
+  width: 100%;
+  max-width: 1002px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.frequency-scheduling h2 {
+  margin: 0 0 16px;
+  color: #101010;
+  text-align: center;
+  font-size: clamp(32px, 5.4vw, 56px);
+  font-weight: 500;
+  line-height: 1.02;
+}
+
+.frequency-scheduling p {
+  margin: 0 auto 32px;
+  max-width: 1002px;
+  color: #2f2f2f;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.38;
+}
+
+.frequency-scheduling-visual-wrap {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.frequency-scheduling-visual {
+  width: 100%;
+  height: 300px;
+}
+
+@media (min-width: 640px) {
+  .frequency-scheduling-inner {
+    padding: 0 24px;
+  }
+
+  .frequency-scheduling-visual {
+    height: 400px;
+  }
+}
+
+@media (min-width: 768px) {
+  .frequency-scheduling {
+    margin-bottom: 0;
+    padding: 64px 0;
+  }
+
+  .frequency-scheduling-inner {
+    padding: 0 32px;
+  }
+
+  .frequency-scheduling p {
+    margin-bottom: 48px;
+  }
+
+  .frequency-scheduling-visual {
+    height: 450px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .frequency-scheduling-visual {
+    height: 500px;
+  }
+}
