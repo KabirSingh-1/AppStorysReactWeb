@@ -25,7 +25,7 @@ export default function Header() {
   return (
     <header className="shell-header">
       <div className="shell-header-inner">
-        <a href="/" className="shell-brand" onClick={() => setOpen(null)}>
+        <a href="/" className="shell-brand" id="track-screen-button" onClick={() => setOpen(null)}>
           <img src={logo} alt="AppStorys" />
           <span>AppStorys</span>
         </a>
@@ -73,14 +73,15 @@ export default function Header() {
           <a href="/contact" className="shell-nav-link">
             Contact
           </a>
-          <a href="#" onClick={(e) => e.preventDefault()} className="shell-nav-link shell-nav-login">
+          <a href="#" onClick={(e) => e.preventDefault()} className="shell-nav-link shell-nav-login" id="touchable-text">
             Login
           </a>
 
-          <a href="/bookademo" className="shell-header-cta">
+          <a href="/bookademo" className="shell-header-cta" id="custom-touchable-button">
             <span className="shell-header-cta-dot" aria-hidden="true">•</span>
             <span>Book a Demo</span>
           </a>
+
         </nav>
       </div>
     </header>

@@ -1,4 +1,5 @@
-export type CampaignType = 'BAN' | 'FLT' | 'PIP' | 'SUR' | 'CSAT' | 'WID' | 'MOD' | 'BTS' | 'SCRT' | 'STR' | 'TLTP';
+export type CampaignType = 'BAN' | 'FLT' | 'PIP' | 'SUR' | 'CSAT' | 'WID' | 'MOD' | 'BTS' | 'SCRT' | 'STR' | 'TLTP' | 'TTP';
+
 
 export interface CrossButtonConfig {
   color: {
@@ -241,7 +242,78 @@ export interface CampaignWidget extends BaseCampaign {
   };
 }
 
-export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | BaseCampaign;
+export interface TooltipStyling {
+  appearance?: {
+    arrowStyle?: { height?: number; width?: number };
+    backdropOpacity?: number;
+    colors?: { arrow?: string; backdrop?: string; tooltip?: string };
+    cornerRadius?: { bottomLeft?: number; bottomRight?: number; topLeft?: number; topRight?: number };
+    highlight?: { padding?: number; radius?: number };
+    padding?: { bottom?: number; left?: number; right?: number; top?: number };
+  };
+  cta?: {
+    container?: {
+      alignment?: string;
+      backgroundColor?: string;
+      borderColor?: string;
+      borderWidth?: number;
+      ctaFullWidth?: boolean;
+      ctaWidth?: number;
+      height?: number;
+    };
+    cornerRadius?: { bottomLeft?: number; bottomRight?: number; topLeft?: number; topRight?: number };
+    margin?: { bottom?: number; left?: number; right?: number; top?: number };
+    text?: { color?: string; fontDecoration?: string[]; fontFamily?: string; fontSize?: number };
+  };
+  subTitle?: {
+    color?: string;
+    fontDecoration?: string[];
+    fontFamily?: string;
+    fontSize?: number;
+    margin?: { bottom?: number; left?: number; right?: number; top?: number };
+    textAlign?: string;
+  };
+  title?: {
+    color?: string;
+    fontDecoration?: string[];
+    fontFamily?: string;
+    fontSize?: number;
+    margin?: { bottom?: number; left?: number; right?: number; top?: number };
+    textAlign?: string;
+  };
+}
+
+export interface TooltipItem {
+  _id: string;
+  arrowPosition?: "left" | "right" | "top" | "bottom" | string;
+  clickAction?: "nextStep" | "close" | string;
+  ctaText?: string;
+  enableBackdrop?: boolean;
+  eventName?: string;
+  link?: string;
+  order?: number;
+  position?: string;
+  styling?: TooltipStyling;
+  subtitleText?: string;
+  target?: string;
+  titleText?: string;
+  url?: string | null;
+}
+
+export interface CampaignTooltip extends BaseCampaign {
+  campaign_type: 'TTP';
+  details: {
+    tooltips?: TooltipItem[];
+    // Include fields directly for single-step support
+    titleText?: string;
+    subtitleText?: string;
+    target?: string;
+    styling?: TooltipStyling;
+  } & Partial<TooltipItem>;
+  display_trigger?: boolean;
+}
+
+export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | BaseCampaign;
 
 export interface InitializationOptions {
   appId: string;

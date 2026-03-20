@@ -71,6 +71,10 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
       url: window.location.href,
     };
 
+    if (currentSlide?.id) {
+      void trackEvent('shared', dataId, { story_slide: currentSlide.id });
+    }
+
     if (navigator.share) {
       try {
         await navigator.share(shareData);
@@ -127,10 +131,8 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
   // Track slide viewed whenever activeSlideIndex changes Node layout budgets setups
   useEffect(() => {
     if (currentStory && currentSlide) {
-      void trackEvent('story_slide_viewed', dataId, {
-        story_id: currentStory.id,
-        slide_id: currentSlide.id,
-        order: currentSlide.order !== undefined ? currentSlide.order : activeSlideIndex
+      void trackEvent('viewed', dataId, {
+        story_slide: currentSlide.id
       });
     }
   }, [activeSlideIndex, currentStory?.id, dataId]);
@@ -222,11 +224,12 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
     const link = isStudio ? slide.content?.link : slide.link;
 
     if (link) {
-      void trackEvent('story_cta_clicked', dataId, { slide_id: slide.id });
+      void trackEvent('clicked', dataId, { story_slide: slide.id });
       if (link.startsWith('http')) {
         window.open(link, '_blank');
       } else {
-        console.log('Story Action:', link);
+        // Fallback for internal app routing or deep links
+        window.location.href = link;
       }
     }
   };
@@ -652,19 +655,19 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
           {(() => {
             const bgColor = currentSlideStyling?.background?.color?.solid || '#000000';
 
-              const containerStyles: React.CSSProperties = {
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: slideIsStudio ? bgColor : '#000',
-                position: 'relative',
-                width: '100%',
-                maxHeight: isDesktop ? 'none' : '100%',
-                aspectRatio: '1080 / 1920',
-                overflow: 'hidden',
-                borderRadius: isDesktop ? '16px' : '0',
-                boxShadow: isDesktop ? '0 12px 36px rgba(0,0,0,0.4)' : 'none',
-              };
+            const containerStyles: React.CSSProperties = {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: slideIsStudio ? bgColor : '#000',
+              position: 'relative',
+              width: '100%',
+              maxHeight: isDesktop ? 'none' : '100%',
+              aspectRatio: '1080 / 1920',
+              overflow: 'hidden',
+              borderRadius: isDesktop ? '16px' : '0',
+              boxShadow: isDesktop ? '0 12px 36px rgba(0,0,0,0.4)' : 'none',
+            };
 
             return (
               <div style={containerStyles}>

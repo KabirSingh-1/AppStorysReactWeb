@@ -31,24 +31,35 @@ const partners = [
 export default function Integrations() {
   return (
     <section className="integrations">
-      <div className="integrations-inner">
-        <div className="integrations-header">
-          <p className="integrations-kicker">Technology Partners</p>
-          <h2>Our Integrations</h2>
+      <div className="integrations-inner" id="tags-wrapper">
+        <div className="integrations-header" id="icon-buttons-row">
+          <p className="integrations-kicker" id="warning-notification">Technology Partners</p>
+          <h2 id="warning-message">Our Integrations</h2>
           <p className="integrations-subcopy">
             We have deep integrations with the largest technology partners for events data flow in real time.
           </p>
         </div>
 
-        <div className="integrations-grid">
-          {partners.map((partner) => (
-            <div key={partner.name} className="integrations-item">
-              <img src={partner.logo} alt={partner.name} />
-            </div>
-          ))}
+        <div className="integrations-grid" id="dashed-border-view">
+          {partners.map((partner, index) => {
+            // Assign remaining IDs to existing grid items for coordinates referencing
+            let itemId: string | undefined = undefined;
+            if (index === 0) itemId = 'red-tag';
+            else if (index === 1) itemId = 'teal-tag';
+            else if (index === 2) itemId = 'blue-tag';
+            else if (index === 3) itemId = 'like-button';
+            else if (index === 4) itemId = 'share-button';
+            else if (index === 5) itemId = 'save-button';
+
+            return (
+              <div key={partner.name} className="integrations-item" id={itemId}>
+                <img src={partner.logo} alt={partner.name} />
+              </div>
+            );
+          })}
         </div>
 
-        <p className="integrations-footcopy">
+        <p className="integrations-footcopy" id="placeholder-content">
           We offer comprehensive CDP integration capabilities, supporting webhooks, API endpoints, and a variety
           of other data ingestion protocols. Our architecture is designed for real-time data processing, ensuring
           minimal latency. If you require specialized integration solutions, we can work directly with your CDP

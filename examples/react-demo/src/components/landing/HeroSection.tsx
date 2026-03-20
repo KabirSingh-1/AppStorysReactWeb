@@ -78,9 +78,10 @@ export default function HeroSection() {
           >
             Watch Demo
           </a>
-          <button className="landing-hero-cta" type="button">
+          <button id="main-text-input" className="landing-hero-cta" type="button">
             Book a Demo
           </button>
+
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-type CampaignType = 'BAN' | 'FLT' | 'PIP' | 'SUR' | 'CSAT' | 'WID' | 'MOD' | 'BTS' | 'SCRT' | 'STR' | 'TLTP';
+type CampaignType = 'BAN' | 'FLT' | 'PIP' | 'SUR' | 'CSAT' | 'WID' | 'MOD' | 'BTS' | 'SCRT' | 'STR' | 'TLTP' | 'TTP';
 interface CrossButtonConfig {
     color: {
         cross: string;
@@ -222,7 +222,119 @@ interface CampaignWidget extends BaseCampaign {
         type?: string;
     };
 }
-type Campaign = CampaignBanner | CampaignStory | CampaignWidget | BaseCampaign;
+interface TooltipStyling {
+    appearance?: {
+        arrowStyle?: {
+            height?: number;
+            width?: number;
+        };
+        backdropOpacity?: number;
+        colors?: {
+            arrow?: string;
+            backdrop?: string;
+            tooltip?: string;
+        };
+        cornerRadius?: {
+            bottomLeft?: number;
+            bottomRight?: number;
+            topLeft?: number;
+            topRight?: number;
+        };
+        highlight?: {
+            padding?: number;
+            radius?: number;
+        };
+        padding?: {
+            bottom?: number;
+            left?: number;
+            right?: number;
+            top?: number;
+        };
+    };
+    cta?: {
+        container?: {
+            alignment?: string;
+            backgroundColor?: string;
+            borderColor?: string;
+            borderWidth?: number;
+            ctaFullWidth?: boolean;
+            ctaWidth?: number;
+            height?: number;
+        };
+        cornerRadius?: {
+            bottomLeft?: number;
+            bottomRight?: number;
+            topLeft?: number;
+            topRight?: number;
+        };
+        margin?: {
+            bottom?: number;
+            left?: number;
+            right?: number;
+            top?: number;
+        };
+        text?: {
+            color?: string;
+            fontDecoration?: string[];
+            fontFamily?: string;
+            fontSize?: number;
+        };
+    };
+    subTitle?: {
+        color?: string;
+        fontDecoration?: string[];
+        fontFamily?: string;
+        fontSize?: number;
+        margin?: {
+            bottom?: number;
+            left?: number;
+            right?: number;
+            top?: number;
+        };
+        textAlign?: string;
+    };
+    title?: {
+        color?: string;
+        fontDecoration?: string[];
+        fontFamily?: string;
+        fontSize?: number;
+        margin?: {
+            bottom?: number;
+            left?: number;
+            right?: number;
+            top?: number;
+        };
+        textAlign?: string;
+    };
+}
+interface TooltipItem {
+    _id: string;
+    arrowPosition?: "left" | "right" | "top" | "bottom" | string;
+    clickAction?: "nextStep" | "close" | string;
+    ctaText?: string;
+    enableBackdrop?: boolean;
+    eventName?: string;
+    link?: string;
+    order?: number;
+    position?: string;
+    styling?: TooltipStyling;
+    subtitleText?: string;
+    target?: string;
+    titleText?: string;
+    url?: string | null;
+}
+interface CampaignTooltip extends BaseCampaign {
+    campaign_type: 'TTP';
+    details: {
+        tooltips?: TooltipItem[];
+        titleText?: string;
+        subtitleText?: string;
+        target?: string;
+        styling?: TooltipStyling;
+    } & Partial<TooltipItem>;
+    display_trigger?: boolean;
+}
+type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | BaseCampaign;
 interface InitializationOptions {
     appId: string;
     accountId: string;
@@ -243,6 +355,8 @@ declare function personalizeText(text: string): string;
 declare const Story: React.FC;
 
 declare const Widget: React.FC;
+
+declare const Tooltip: React.FC;
 
 declare class AppStorys {
     private state;
@@ -269,4 +383,4 @@ declare class AppStorys {
 
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignType, type CampaignWidget, type CrossButtonConfig, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
