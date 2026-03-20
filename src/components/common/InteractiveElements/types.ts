@@ -75,7 +75,51 @@ export interface RatingStickerData extends BaseStickerData {
   };
 }
 
-export type StickerData = PollStickerData | QuizStickerData | RatingStickerData;
+export interface QuestionStickerData extends BaseStickerData {
+  type: 'question';
+  question: string;
+  placeholder?: string;
+  styling?: BaseStickerData['styling'] & {
+    promptColor?: string;
+    inputBgColor?: string;
+  };
+}
+
+export interface ImageQuizOption extends QuizOption {
+  image?: string;
+}
+
+export interface ImageQuizStickerData extends BaseStickerData {
+  type: 'image_quiz';
+  question: string;
+  options: ImageQuizOption[];
+}
+
+export interface CountdownStickerData extends BaseStickerData {
+  type: 'countdown';
+  title: string;
+  targetDate: string; // ISO string format
+}
+
+export interface PromoCodeStickerData extends BaseStickerData {
+  type: 'promo_code';
+  code: string;
+}
+
+export interface ReactionStickerData extends BaseStickerData {
+  type: 'reaction';
+  emojis?: string[];
+}
+
+export type StickerData = 
+  | PollStickerData 
+  | QuizStickerData 
+  | RatingStickerData 
+  | QuestionStickerData 
+  | ImageQuizStickerData 
+  | CountdownStickerData 
+  | PromoCodeStickerData
+  | ReactionStickerData;
 
 export interface StickerProps<T extends BaseStickerData> {
   data: T;

@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Story as StoryType, StorySlide } from '../../types';
 import trackEvent from '../../core/trackEvent';
-import { InteractiveOverlay } from './Interactive/InteractiveOverlay';
-import { StickerData } from './Interactive/types';
+import { InteractiveOverlay } from '../common/InteractiveElements/InteractiveOverlay';
+import { StickerData } from '../common/InteractiveElements/types';
+import PlayPauseButton from '../common/CommonElements/PlayPauseButton';
+import Cta from '../common/CommonElements/Cta';
+import CrossButton from '../common/CommonElements/CrossButton';
+import { SoundButton } from '../common/CommonElements/SoundButton';
+import ShareButton from '../common/CommonElements/ShareButton';
 
 interface StoryOverlayProps {
   stories: StoryType[];
@@ -368,43 +373,38 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 {/* Share/Send Premium Icon */}
-                <div onClick={handleShare} style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
-                </div>
+                <ShareButton
+                  config={{
+                    enabled: currentStory?.styling?.share?.enabled ?? true,
+                    image: currentStory?.styling?.share?.image ?? '',
+                    color: {
+                      cross: currentStory?.styling?.share?.color?.cross ?? '#ffffff',
+                      fill: currentStory?.styling?.share?.color?.fill ?? 'rgba(255,255,255,0.08)',
+                      stroke: currentStory?.styling?.share?.color?.stroke ?? 'transparent',
+                    },
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                    size: currentStory?.styling?.share?.size ?? 36
+                  }}
+                  onPress={handleShare}
+                  style={{ position: 'relative', borderRadius: '10px' }}
+                />
 
                 {/* Speaker Mute/Unmute Premium Icon */}
-                <div onClick={toggleMute} style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}>
-                  {isMuted ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                      <line x1="23" y1="9" x2="17" y2="15"></line>
-                      <line x1="17" y1="9" x2="23" y2="15"></line>
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                    </svg>
-                  )}
-                </div>
+                <SoundButton
+                  config={{
+                    size: 36,
+                    color: { cross: '#ffffff', fill: 'rgba(255,255,255,0.08)', stroke: 'transparent' },
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                    image: isMuted ? (currentStory?.styling?.soundToggle?.mute?.image || '') : (currentStory?.styling?.soundToggle?.unmute?.image || '')
+                  }}
+                  onPress={toggleMute}
+                  type={isMuted ? 'unmute' : 'mute'}
+                  enabled={soundConfig?.enabled}
+                  style={{ position: 'relative', borderRadius: '10px' }}
+                />
 
                 {/* Play/Pause Premium Icon */}
-                <div onClick={() => setIsPaused(!isPaused)} style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}>
-                  {isPaused ? (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                      <path d="M5 3.867v16.266c0 .54.58.88 1.05.61l14.133-8.133c.46-.27.46-.94 0-1.21L6.05 3.257C5.58 2.987 5 3.327 5 3.867z"></path>
-                    </svg>
-                  ) : (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                      <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-                      <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-                    </svg>
-                  )}
-                </div>
+                <PlayPauseButton isPaused={isPaused} onPress={() => setIsPaused(!isPaused)} />
               </div>
             </div>
 
@@ -413,14 +413,30 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
 
               {/* Keyboard/Grid Shortcuts Icon with Dropout Menu List */}
               <div style={{ position: 'relative' }}>
-                <div onClick={() => { setShowShortcuts(!showShortcuts); setIsPaused(!showShortcuts); }} style={{ width: '36px', height: '36px', background: showShortcuts ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)', border: showShortcuts ? '1px solid white' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s' }}>
+                <button
+                  onClick={() => { setShowShortcuts(!showShortcuts); setIsPaused(!showShortcuts); }}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    background: showShortcuts ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
+                    border: showShortcuts ? '1px solid white' : '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    padding: 0,
+                    outline: 'none'
+                  }}
+                >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="7" height="7"></rect>
                     <rect x="14" y="3" width="7" height="7"></rect>
                     <rect x="14" y="14" width="7" height="7"></rect>
                     <rect x="3" y="14" width="7" height="7"></rect>
                   </svg>
-                </div>
+                </button>
 
                 {showShortcuts && (
                   <>
@@ -480,12 +496,17 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
               </div>
 
               {/* Close (X) Premium Icon */}
-              <div onClick={onClose} style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </div>
+              <CrossButton
+                config={{
+                  enabled: crossConfig?.enabled ?? true,
+                  image: crossConfig?.image ?? '',
+                  color: { cross: '#ffffff', fill: 'rgba(255,255,255,0.08)', stroke: 'transparent' },
+                  margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                  size: 36
+                }}
+                onPress={onClose}
+                style={{ position: 'relative', borderRadius: '10px' }}
+              />
             </div>
           </div>
         </>
@@ -603,12 +624,12 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {soundConfig?.enabled && (
-                  <button onClick={toggleMute} style={{ background: 'none', border: 'none', color: 'white', fontSize: '18px', cursor: 'pointer', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+                  <button onClick={toggleMute} style={{ background: 'none', border: 'none', color: 'white', fontSize: '18px', cursor: 'pointer', textShadow: '0 1px 3px rgba(0,0,0,0.8)', padding: 0, outline: 'none' }}>
                     {isMuted ? '🔇' : '🔊'}
                   </button>
                 )}
                 {crossConfig?.enabled !== false && (
-                  <button onClick={(e) => { e.stopPropagation(); onClose(); }} style={{ background: 'none', border: 'none', color: 'white', fontSize: '20px', cursor: 'pointer', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+                  <button onClick={(e) => { if (e && e.stopPropagation) e.stopPropagation(); onClose(); }} style={{ background: 'none', border: 'none', color: 'white', fontSize: '20px', cursor: 'pointer', textShadow: '0 1px 3px rgba(0,0,0,0.8)', padding: 0, outline: 'none' }}>
                     ✕
                   </button>
                 )}
@@ -654,50 +675,13 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
           })()}
 
           {/* CTA Footer Section */}
-          {(slideCtaText || slideCtaLink) && (() => {
-            const ctaMargin = currentSlideStyling?.cta?.margin;
-            const ctaRadius = ctaStyling?.cornerRadius;
-            const bLeft = ctaRadius?.bottomLeft || 12;
-            const bRight = ctaRadius?.bottomRight || 12;
-            const tLeft = ctaRadius?.topLeft || 12;
-            const tRight = ctaRadius?.topRight || 12;
-
-            return (
-              <div style={{
-                position: 'absolute',
-                bottom: '0px',
-                left: '0px',
-                right: '0px',
-                padding: `${ctaMargin?.top || 12}px ${ctaMargin?.right || 16}px ${ctaMargin?.bottom || 12}px ${ctaMargin?.left || 16}px`,
-                zIndex: 10,
-                display: 'flex',
-                justifyContent: ctaContainer?.alignment === 'center' ? 'center' : 'flex-end',
-                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)'
-              }}>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleClickCTA(currentSlide); }}
-                  style={{
-                    width: ctaContainer?.ctaFullWidth ? '100%' : (ctaContainer?.ctaWidth ? `${ctaContainer.ctaWidth}px` : 'auto'),
-                    height: `${ctaContainer?.height || 45}px`,
-                    backgroundColor: ctaContainer?.backgroundColor || '#F97316',
-                    color: ctaTextStyling?.color || 'white',
-                    borderRadius: `${tLeft}px ${tRight}px ${bRight}px ${bLeft}px`,
-                    border: ctaContainer?.borderColor ? `${ctaContainer.borderWidth || 1}px solid ${ctaContainer.borderColor}` : 'none',
-                    fontSize: `${ctaTextStyling?.fontSize || 14}px`,
-                    fontFamily: ctaTextStyling?.fontFamily || 'Arial',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)'
-                  }}
-                >
-                  {slideCtaText || 'Learn More'}
-                </button>
-              </div>
-            );
-          })()}
+          {(slideCtaText || slideCtaLink) && (
+            <Cta
+              cta={currentSlide?.styling?.cta}
+              buttonText={slideCtaText || 'Learn More'}
+              onPress={(e) => { if (e && e.stopPropagation) e.stopPropagation(); handleClickCTA(currentSlide); }}
+            />
+          )}
         </div>
 
         {isDesktop && (

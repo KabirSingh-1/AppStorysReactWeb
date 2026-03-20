@@ -106,6 +106,73 @@ export const InteractiveOverlay: React.FC<InteractiveOverlayProps> = ({
       } as any;
     }
 
+    if (baseData.type === 'question' || baseData.type === 'ask_question') {
+      return {
+        ...baseData,
+        type: 'question',
+        question: data.question || data.title || 'Ask me a question',
+        placeholder: data.placeholder || 'Type something...',
+        styling: {
+          ...baseData.styling,
+          promptColor: style.questionColor || style.textColor,
+          inputBgColor: style.inputBgColor,
+        },
+      } as any;
+    }
+
+    if (baseData.type === 'image_quiz' || baseData.type === 'imageQuiz') {
+      return {
+        ...baseData,
+        type: 'image_quiz',
+        question: data.question || data.title || 'Image Quiz',
+        options: (data.options || []).map((o: any) => ({
+          id: o.id || Math.random().toString(),
+          text: o.text || o.title || '',
+          image: o.image || o.imageUrl || '',
+          isCorrect: o.isCorrect === true
+        })),
+        styling: {
+          ...baseData.styling,
+          questionTextColor: style.questionColor,
+          activeColor: style.correctColor,
+          incorrectColor: style.incorrectColor,
+        },
+      } as any;
+    }
+
+    if (baseData.type === 'countdown') {
+      return {
+        ...baseData,
+        type: 'countdown',
+        title: data.title || 'Ends in...',
+        targetDate: data.targetDate || data.endDate || new Date(Date.now() + 86400000).toISOString(),
+        styling: {
+          ...baseData.styling,
+          borderColor: style.borderColor,
+        },
+      } as any;
+    }
+
+    if (baseData.type === 'promo_code' || baseData.type === 'promoCode') {
+      return {
+        ...baseData,
+        type: 'promo_code',
+        code: data.code || 'CODE20',
+        styling: {
+          ...baseData.styling,
+          borderColor: style.borderColor,
+        },
+      } as any;
+    }
+
+    if (baseData.type === 'reaction' || baseData.type === 'emoji_reaction') {
+      return {
+        ...baseData,
+        type: 'reaction',
+        emojis: data.emojis || ['😍', '👍'],
+      } as any;
+    }
+
     return baseData as any;
   });
 

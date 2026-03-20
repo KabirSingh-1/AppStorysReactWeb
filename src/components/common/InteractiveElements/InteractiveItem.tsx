@@ -2,8 +2,12 @@ import React from 'react';
 import { StickerData } from './types';
 import { PollSticker } from './PollSticker';
 import { QuizSticker } from './QuizSticker';
-
+import { CountdownSticker } from './CountdownSticker';
+import { PromoCodeSticker } from './PromoCodeSticker';
+import { ReactionSticker } from './ReactionSticker';
 import { RatingSticker } from './RatingSticker';
+import { QuestionSticker } from './QuestionSticker';
+import { ImageQuizSticker } from './ImageQuizSticker';
 
 interface InteractiveItemProps {
   data: StickerData;
@@ -50,6 +54,16 @@ export const InteractiveItem: React.FC<InteractiveItemProps> = ({
         return <QuizSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
       case 'rating':
         return <RatingSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
+      case 'question':
+        return <QuestionSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
+      case 'image_quiz':
+        return <ImageQuizSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
+      case 'countdown':
+        return <CountdownSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
+      case 'promo_code':
+        return <PromoCodeSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
+      case 'reaction':
+        return <ReactionSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
       case 'image':
         return <img src={(data as any).url} alt="static overlay" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />;
       case 'text': {
