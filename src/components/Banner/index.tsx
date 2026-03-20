@@ -100,14 +100,17 @@ export const Banner: React.FC = () => {
 
   return (
     <div ref={containerRef} style={bannerStyle} onClick={handleClick}>
-      {lottieData ? (
-        <Lottie 
-          animationData={lottieData} 
-          loop={true} 
-          autoplay={sdkVisible}
-          style={mediaStyle}
-        />
-      ) : details.image ? (
+      {lottieData ? (() => {
+        const LottieComp = (Lottie as any).default || Lottie;
+        return (
+          <LottieComp 
+            animationData={lottieData} 
+            loop={true} 
+            autoplay={sdkVisible}
+            style={mediaStyle}
+          />
+        );
+      })() : details.image ? (
         <img src={details.image} alt="Campaign Banner" style={mediaStyle} />
       ) : null}
       

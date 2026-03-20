@@ -37,6 +37,7 @@ export const InteractiveItem: React.FC<InteractiveItemProps> = ({
     top: `${y}%`,
     left: `${x}%`,
     width: `${width}%`,
+    height: (data as any).height ? `${(data as any).height}%` : 'auto',
     transform: `rotate(${rotation}deg)`,
     zIndex: 10,
     transformOrigin: 'center center',
@@ -65,7 +66,7 @@ export const InteractiveItem: React.FC<InteractiveItemProps> = ({
       case 'reaction':
         return <ReactionSticker data={data as any} onInteraction={onInteraction} isEditing={isEditing} />;
       case 'image':
-        return <img src={(data as any).url} alt="static overlay" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />;
+        return <img src={(data as any).url} alt="static overlay" style={{ width: '100%', height: '100%', objectFit: 'fill' }} />;
       case 'text': {
         const textStyle = (data as any).styling || {};
         return (

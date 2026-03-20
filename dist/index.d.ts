@@ -131,6 +131,7 @@ interface StorySlide {
     content?: any;
     id: string;
     image: string | null;
+    interactions?: any[];
     link: string | null;
     order: number;
     parent: string;

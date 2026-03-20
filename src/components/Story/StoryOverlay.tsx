@@ -61,6 +61,7 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
   const slideBgImage = slideIsStudio ? currentSlideStyling?.background?.media?.mediaUrl : currentSlide?.image;
   const slideCtaText = slideIsStudio ? currentSlide?.content?.button_text : currentSlide?.button_text;
   const slideCtaLink = slideIsStudio ? currentSlide?.content?.link : currentSlide?.link;
+  const slideVideo = currentSlide?.video || (slideIsStudio ? currentSlide?.content?.video?.[0]?.link : undefined);
 
   // Helper function for Native Share or Rich Toast
   const handleShare = async () => {
@@ -123,10 +124,21 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeSlideIndex, activeStoryIndex, isPaused, currentStory, onClose]);
 
+  // Track slide viewed whenever activeSlideIndex changes Node layout budgets setups
+  useEffect(() => {
+    if (currentStory && currentSlide) {
+      void trackEvent('story_slide_viewed', dataId, {
+        story_id: currentStory.id,
+        slide_id: currentSlide.id,
+        order: currentSlide.order !== undefined ? currentSlide.order : activeSlideIndex
+      });
+    }
+  }, [activeSlideIndex, currentStory?.id, dataId]);
+
   useEffect(() => {
     if (currentStory && currentSlide) {
       const slideTime = currentStory.styling?.slideShowTime || 5;
-      const isVideo = !!currentSlide.video;
+      const isVideo = !!slideVideo;
 
       if (progressTimerRef.current) {
         clearInterval(progressTimerRef.current);
@@ -307,8 +319,8 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
 
       {/* Dynamic Ambient Glow Background Blur of current slide */}
       <div key={`${activeStoryIndex}-${activeSlideIndex}`} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none', transition: 'all 0.6s ease-in-out' }}>
-        {currentSlide.video ? (
-          <video src={currentSlide.video} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(120px) saturate(1.8) opacity(0.35)' }} muted />
+        {slideVideo ? (
+          <video src={slideVideo} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(120px) saturate(1.8) opacity(0.35)' }} muted />
         ) : (
           <img src={slideBgImage || currentStory.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(120px) saturate(1.8) opacity(0.35)' }} />
         )}
@@ -541,11 +553,7 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
 
               return (
                 <div style={sideCardStyle} onClick={handlePrevSlide}>
-                  {prevMedia.video ? (
-                    <video src={prevMedia.video} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />
-                  ) : (
-                    <img src={prevBgImage || currentStory.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  )}
+                  <img src={prevBgImage || currentStory.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(1px)' }} />
                 </div>
               );
@@ -644,22 +652,24 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
           {(() => {
             const bgColor = currentSlideStyling?.background?.color?.solid || '#000000';
 
-            const containerStyles: React.CSSProperties = {
-              flex: 1,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: slideIsStudio ? bgColor : '#000',
-              position: 'relative',
-              width: '100%',
-              height: '100%',
-              overflow: 'hidden',
-            };
+              const containerStyles: React.CSSProperties = {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: slideIsStudio ? bgColor : '#000',
+                position: 'relative',
+                width: '100%',
+                maxHeight: isDesktop ? 'none' : '100%',
+                aspectRatio: '1080 / 1920',
+                overflow: 'hidden',
+                borderRadius: isDesktop ? '16px' : '0',
+                boxShadow: isDesktop ? '0 12px 36px rgba(0,0,0,0.4)' : 'none',
+              };
 
             return (
               <div style={containerStyles}>
-                {currentSlide.video ? (
-                  <video ref={activeVideoRef} src={currentSlide.video} autoPlay playsInline muted={isMuted} onLoadedData={handleVideoLoad} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {slideVideo ? (
+                  <video ref={activeVideoRef} src={slideVideo} autoPlay playsInline muted={isMuted} onLoadedData={handleVideoLoad} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   (slideBgImage || (!slideIsStudio && currentStory?.thumbnail)) && (
                     <img
@@ -669,7 +679,7 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
                     />
                   )
                 )}
-                <InteractiveOverlay content={currentSlide.content} />
+                <InteractiveOverlay content={{ ...currentSlide.content, interactions: currentSlide.interactions }} />
               </div>
             );
           })()}
@@ -707,11 +717,7 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
 
               return (
                 <div style={sideCardStyle} onClick={handleNextSlide}>
-                  {nextMedia.video ? (
-                    <video src={nextMedia.video} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />
-                  ) : (
-                    <img src={nextBgImage || currentStory.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  )}
+                  <img src={nextBgImage || currentStory.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(1px)' }} />
                 </div>
               );
