@@ -304,7 +304,7 @@ export interface CampaignTooltip extends BaseCampaign {
   campaign_type: 'TTP';
   details: {
     tooltips?: TooltipItem[];
-    // Include fields directly for single-step support
+  
     titleText?: string;
     subtitleText?: string;
     target?: string;
@@ -313,7 +313,34 @@ export interface CampaignTooltip extends BaseCampaign {
   display_trigger?: boolean;
 }
 
-export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | BaseCampaign;
+export interface BottomSheetElement {
+  id: string;
+  type: 'image' | 'cta' | 'body' | string;
+  order: number;
+  [key: string]: any;
+}
+
+export interface CampaignBottomSheet extends BaseCampaign {
+  campaign_type: 'BTS';
+  details: {
+    backdropColor?: string;
+    backdropOpacity?: number;
+    backgroundColor?: string;
+    bottomsheetType?: string;
+    cornerRadius?: {
+      bottomLeft?: number;
+      bottomRight?: number;
+      topLeft?: number;
+      topRight?: number;
+    };
+    crossButton?: CrossButtonConfig;
+    elements: BottomSheetElement[];
+    id: string;
+    name: string;
+  };
+}
+
+export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | BaseCampaign;
 
 export interface InitializationOptions {
   appId: string;

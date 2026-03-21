@@ -334,7 +334,32 @@ interface CampaignTooltip extends BaseCampaign {
     } & Partial<TooltipItem>;
     display_trigger?: boolean;
 }
-type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | BaseCampaign;
+interface BottomSheetElement {
+    id: string;
+    type: 'image' | 'cta' | 'body' | string;
+    order: number;
+    [key: string]: any;
+}
+interface CampaignBottomSheet extends BaseCampaign {
+    campaign_type: 'BTS';
+    details: {
+        backdropColor?: string;
+        backdropOpacity?: number;
+        backgroundColor?: string;
+        bottomsheetType?: string;
+        cornerRadius?: {
+            bottomLeft?: number;
+            bottomRight?: number;
+            topLeft?: number;
+            topRight?: number;
+        };
+        crossButton?: CrossButtonConfig;
+        elements: BottomSheetElement[];
+        id: string;
+        name: string;
+    };
+}
+type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | BaseCampaign;
 interface InitializationOptions {
     appId: string;
     accountId: string;
@@ -357,6 +382,8 @@ declare const Story: React.FC;
 declare const Widget: React.FC;
 
 declare const Tooltip: React.FC;
+
+declare const BottomSheet: React.FC;
 
 declare class AppStorys {
     private state;
@@ -383,4 +410,4 @@ declare class AppStorys {
 
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, type Campaign, type CampaignBanner, type CampaignStory, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, BottomSheet, type BottomSheetElement, type Campaign, type CampaignBanner, type CampaignBottomSheet, type CampaignStory, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };

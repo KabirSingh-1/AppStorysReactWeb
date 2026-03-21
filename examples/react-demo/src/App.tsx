@@ -33,6 +33,9 @@ const FloaterComponent =
 const TooltipComponent =
   (AppStorysSDK as any).Tooltip?.default ??
   (AppStorysSDK as any).Tooltip;
+const BottomSheetComponent =
+  (AppStorysSDK as any).BottomSheet?.default ??
+  (AppStorysSDK as any).BottomSheet;
 
 
 function App() {
@@ -105,6 +108,7 @@ function App() {
       {PipComponent ? <PipComponent /> : null}
       {FloaterComponent ? <FloaterComponent /> : null}
       {TooltipComponent ? <TooltipComponent /> : null}
+      {BottomSheetComponent ? <BottomSheetComponent /> : null}
       <Footer />
 
       {/* Toggle Button */}
