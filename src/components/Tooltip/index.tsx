@@ -160,6 +160,20 @@ export const Tooltip: React.FC = () => {
     tooltipLeft = absoluteLeft + (targetRect.width / 2) - (tooltipSize.width / 2);
   }
 
+  // Bounds checking to prevent cutting off at viewport edge
+  const safeMargin = 8;
+  const viewportTop = window.scrollY;
+  const viewportBottom = window.scrollY + window.innerHeight;
+  const viewportLeft = window.scrollX;
+  const viewportRight = window.scrollX + window.innerWidth;
+
+  if (tooltipSize.height > 0) {
+    tooltipTop = Math.max(viewportTop + safeMargin, Math.min(viewportBottom - tooltipSize.height - safeMargin, tooltipTop));
+  }
+  if (tooltipSize.width > 0) {
+    tooltipLeft = Math.max(viewportLeft + safeMargin, Math.min(viewportRight - tooltipSize.width - safeMargin, tooltipLeft));
+  }
+
   const handleNext = () => {
     const action = currentTooltip.clickAction || "nextStep";
     const targetLink = currentTooltip.link || currentTooltip.url;
@@ -228,25 +242,25 @@ export const Tooltip: React.FC = () => {
             borderStyle: "solid",
             ...(arrowPos === "left" && {
               left: -offsetGap,
-              top: tooltipSize.height / 2 - arrowSize,
+              top: Math.max(12, Math.min(tooltipSize.height - arrowSize * 2 - 12, absoluteTop + (targetRect.height / 2) - tooltipTop - arrowSize)),
               borderWidth: `${arrowSize}px ${offsetGap}px ${arrowSize}px 0`,
               borderColor: `transparent ${colors.tooltip || "#FE6B35"} transparent transparent`,
             }),
             ...(arrowPos === "right" && {
               right: -offsetGap,
-              top: tooltipSize.height / 2 - arrowSize,
+              top: Math.max(12, Math.min(tooltipSize.height - arrowSize * 2 - 12, absoluteTop + (targetRect.height / 2) - tooltipTop - arrowSize)),
               borderWidth: `${arrowSize}px 0 ${arrowSize}px ${offsetGap}px`,
               borderColor: `transparent transparent transparent ${colors.tooltip || "#FE6B35"}`,
             }),
             ...(arrowPos === "top" && {
               top: -offsetGap,
-              left: tooltipSize.width / 2 - arrowSize,
+              left: Math.max(12, Math.min(tooltipSize.width - arrowSize * 2 - 12, absoluteLeft + (targetRect.width / 2) - tooltipLeft - arrowSize)),
               borderWidth: `0 ${arrowSize}px ${offsetGap}px ${arrowSize}px`,
               borderColor: `transparent transparent ${colors.tooltip || "#FE6B35"} transparent`,
             }),
             ...(arrowPos === "bottom" && {
               bottom: -offsetGap,
-              left: tooltipSize.width / 2 - arrowSize,
+              left: Math.max(12, Math.min(tooltipSize.width - arrowSize * 2 - 12, absoluteLeft + (targetRect.width / 2) - tooltipLeft - arrowSize)),
               borderWidth: `${offsetGap}px ${arrowSize}px 0 ${arrowSize}px`,
               borderColor: `${colors.tooltip || "#FE6B35"} transparent transparent transparent`,
             }),
