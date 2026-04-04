@@ -340,7 +340,149 @@ export interface CampaignBottomSheet extends BaseCampaign {
   };
 }
 
-export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | BaseCampaign;
+export interface CsatTextStyle {
+  color?: string;
+  fontDecoration?: string[];
+  fontFamily?: string;
+  fontSize?: number;
+  textAlign?: string;
+}
+
+export interface CsatSpacing {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
+
+export interface CsatCampaignDetails {
+  campaign?: string;
+  description_text?: string;
+  feedback_option?: Record<string, string>;
+  height?: number;
+  highStarText?: string;
+  id: string;
+  link?: string;
+  lowStarText?: string;
+  styling?: {
+    appearance?: {
+      backgroundColor?: string;
+      borderRadius?: number;
+      displayDelay?: number;
+      margin?: CsatSpacing;
+      padding?: CsatSpacing;
+    };
+    crossButton?: CrossButtonConfig;
+    feedbackPage?: {
+      additionalComments?: {
+        borderWidth?: number;
+        colors?: {
+          background?: string;
+          border?: string;
+          text?: string;
+        };
+        enabled?: boolean;
+        placeholder?: string;
+        textStyle?: CsatTextStyle;
+      };
+      options?: {
+        cornerRadius?: {
+          topLeft?: number;
+          topRight?: number;
+          bottomLeft?: number;
+          bottomRight?: number;
+        };
+        margin?: CsatSpacing;
+        nonSelectedOptions?: {
+          borderWidth?: number;
+          colors?: {
+            background?: string;
+            border?: string;
+            text?: string;
+          };
+          textStyle?: CsatTextStyle;
+        };
+        optionsHeight?: number;
+        optionsSpacing?: number;
+        selectedOptions?: {
+          borderWidth?: number;
+          colors?: {
+            background?: string;
+            border?: string;
+            text?: string;
+          };
+          textStyle?: CsatTextStyle;
+        };
+      };
+      submitButton?: {
+        cta?: StorySlideCta;
+        enabled?: boolean;
+        text?: string;
+      };
+    };
+    initialFeedback?: {
+      subtitle?: {
+        margin?: CsatSpacing;
+        textStyle?: CsatTextStyle;
+      };
+      title?: {
+        margin?: CsatSpacing;
+        textStyle?: CsatTextStyle;
+      };
+    };
+    rating?: {
+      highRatingSubtitle?: string;
+      highRatingTitle?: string;
+      lowRatingSubtitle?: string;
+      lowRatingTitle?: string;
+      ratingType?: string;
+      star?: {
+        high?: {
+          stylingContainer?: { background?: string; border?: string; borderWidth?: number };
+          stylingStar?: { background?: string; border?: string; borderWidth?: number };
+        };
+        low?: {
+          stylingContainer?: { background?: string; border?: string; borderWidth?: number };
+          stylingStar?: { background?: string; border?: string; borderWidth?: number };
+        };
+        unselected?: {
+          stylingContainer?: { background?: string; border?: string; borderWidth?: number };
+          stylingStar?: { background?: string; border?: string; borderWidth?: number };
+        };
+      };
+    };
+    thankyouPage?: {
+      doneButton?: {
+        cta?: StorySlideCta;
+        text?: string;
+      };
+      imageStyle?: {
+        height?: number;
+        width?: number;
+      };
+      subtitle?: {
+        margin?: CsatSpacing;
+        textStyle?: CsatTextStyle;
+      };
+      title?: {
+        margin?: CsatSpacing;
+        textStyle?: CsatTextStyle;
+      };
+    };
+  };
+  thankyouDescription?: string;
+  thankyouImage?: string;
+  thankyouText?: string;
+  title?: string;
+  width?: number;
+}
+
+export interface CampaignCsat extends BaseCampaign {
+  campaign_type: 'CSAT';
+  details: CsatCampaignDetails;
+}
+
+export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | CampaignCsat | BaseCampaign;
 
 export interface InitializationOptions {
   appId: string;
