@@ -36,6 +36,9 @@ const TooltipComponent =
 const BottomSheetComponent =
   (AppStorysSDK as any).BottomSheet?.default ??
   (AppStorysSDK as any).BottomSheet;
+const CsatComponent =
+  (AppStorysSDK as any).Csat?.default ??
+  (AppStorysSDK as any).Csat;
 
 
 function App() {
@@ -109,6 +112,7 @@ function App() {
       {FloaterComponent ? <FloaterComponent /> : null}
       {TooltipComponent ? <TooltipComponent /> : null}
       {BottomSheetComponent ? <BottomSheetComponent /> : null}
+      {CsatComponent ? <CsatComponent /> : null}
       <Footer />
 
       {/* Toggle Button */}

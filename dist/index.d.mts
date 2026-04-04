@@ -359,7 +359,169 @@ interface CampaignBottomSheet extends BaseCampaign {
         name: string;
     };
 }
-type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | BaseCampaign;
+interface CsatTextStyle {
+    color?: string;
+    fontDecoration?: string[];
+    fontFamily?: string;
+    fontSize?: number;
+    textAlign?: string;
+}
+interface CsatSpacing {
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+}
+interface CsatCampaignDetails {
+    campaign?: string;
+    description_text?: string;
+    feedback_option?: Record<string, string>;
+    height?: number;
+    highStarText?: string;
+    id: string;
+    link?: string;
+    lowStarText?: string;
+    styling?: {
+        appearance?: {
+            backgroundColor?: string;
+            borderRadius?: number;
+            displayDelay?: number;
+            margin?: CsatSpacing;
+            padding?: CsatSpacing;
+        };
+        crossButton?: CrossButtonConfig;
+        feedbackPage?: {
+            additionalComments?: {
+                borderWidth?: number;
+                colors?: {
+                    background?: string;
+                    border?: string;
+                    text?: string;
+                };
+                enabled?: boolean;
+                placeholder?: string;
+                textStyle?: CsatTextStyle;
+            };
+            options?: {
+                cornerRadius?: {
+                    topLeft?: number;
+                    topRight?: number;
+                    bottomLeft?: number;
+                    bottomRight?: number;
+                };
+                margin?: CsatSpacing;
+                nonSelectedOptions?: {
+                    borderWidth?: number;
+                    colors?: {
+                        background?: string;
+                        border?: string;
+                        text?: string;
+                    };
+                    textStyle?: CsatTextStyle;
+                };
+                optionsHeight?: number;
+                optionsSpacing?: number;
+                selectedOptions?: {
+                    borderWidth?: number;
+                    colors?: {
+                        background?: string;
+                        border?: string;
+                        text?: string;
+                    };
+                    textStyle?: CsatTextStyle;
+                };
+            };
+            submitButton?: {
+                cta?: StorySlideCta;
+                enabled?: boolean;
+                text?: string;
+            };
+        };
+        initialFeedback?: {
+            subtitle?: {
+                margin?: CsatSpacing;
+                textStyle?: CsatTextStyle;
+            };
+            title?: {
+                margin?: CsatSpacing;
+                textStyle?: CsatTextStyle;
+            };
+        };
+        rating?: {
+            highRatingSubtitle?: string;
+            highRatingTitle?: string;
+            lowRatingSubtitle?: string;
+            lowRatingTitle?: string;
+            ratingType?: string;
+            star?: {
+                high?: {
+                    stylingContainer?: {
+                        background?: string;
+                        border?: string;
+                        borderWidth?: number;
+                    };
+                    stylingStar?: {
+                        background?: string;
+                        border?: string;
+                        borderWidth?: number;
+                    };
+                };
+                low?: {
+                    stylingContainer?: {
+                        background?: string;
+                        border?: string;
+                        borderWidth?: number;
+                    };
+                    stylingStar?: {
+                        background?: string;
+                        border?: string;
+                        borderWidth?: number;
+                    };
+                };
+                unselected?: {
+                    stylingContainer?: {
+                        background?: string;
+                        border?: string;
+                        borderWidth?: number;
+                    };
+                    stylingStar?: {
+                        background?: string;
+                        border?: string;
+                        borderWidth?: number;
+                    };
+                };
+            };
+        };
+        thankyouPage?: {
+            doneButton?: {
+                cta?: StorySlideCta;
+                text?: string;
+            };
+            imageStyle?: {
+                height?: number;
+                width?: number;
+            };
+            subtitle?: {
+                margin?: CsatSpacing;
+                textStyle?: CsatTextStyle;
+            };
+            title?: {
+                margin?: CsatSpacing;
+                textStyle?: CsatTextStyle;
+            };
+        };
+    };
+    thankyouDescription?: string;
+    thankyouImage?: string;
+    thankyouText?: string;
+    title?: string;
+    width?: number;
+}
+interface CampaignCsat extends BaseCampaign {
+    campaign_type: 'CSAT';
+    details: CsatCampaignDetails;
+}
+type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | CampaignCsat | BaseCampaign;
 interface InitializationOptions {
     appId: string;
     accountId: string;
@@ -384,6 +546,8 @@ declare const Widget: React.FC;
 declare const Tooltip: React.FC;
 
 declare const BottomSheet: React.FC;
+
+declare const Csat: React.FC;
 
 declare class AppStorys {
     private state;
@@ -410,4 +574,4 @@ declare class AppStorys {
 
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, BottomSheet, type BottomSheetElement, type Campaign, type CampaignBanner, type CampaignBottomSheet, type CampaignStory, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, BottomSheet, type BottomSheetElement, type Campaign, type CampaignBanner, type CampaignBottomSheet, type CampaignCsat, type CampaignStory, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Csat, type CsatCampaignDetails, type CsatSpacing, type CsatTextStyle, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
