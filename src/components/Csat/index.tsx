@@ -6,7 +6,6 @@ import CrossButton from '../common/CommonElements/CrossButton';
 import { CampaignCsat, CsatCampaignDetails, CsatSpacing, CsatTextStyle } from '../../types';
 
 const FIVE_STAR_MAX = 5;
-const LOW_RATING_THRESHOLD = 3;
 
 function asSpacingValue(value?: number): string | undefined {
   if (value == null) return undefined;
@@ -52,6 +51,72 @@ function getAlignment(alignment?: string): React.CSSProperties['justifyContent']
   return 'center';
 }
 
+function getRatingType(details: CsatCampaignDetails): 'star' | 'number' | 'emoji' {
+  const ratingType = details.styling?.rating?.ratingType;
+  if (ratingType === 'number' || ratingType === 'emoji' || ratingType === 'star') return ratingType;
+  return 'star';
+}
+
+function getEmojiChoices(details: CsatCampaignDetails): string[] {
+  const configured = details.styling?.rating?.emoji as unknown;
+
+  if (Array.isArray(configured)) {
+    return configured.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+  }
+
+  if (configured && typeof configured === 'object') {
+    const values = Object.values(configured as Record<string, unknown>)
+      .filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+    if (values.length > 0) return values;
+  }
+
+  if (typeof configured === 'string' && configured.trim()) {
+    if (configured.includes(',')) {
+      const split = configured.split(',').map((item) => item.trim()).filter(Boolean);
+      if (split.length > 0) return split;
+    }
+    return [configured];
+  }
+
+  return ['😠', '😕', '😐', '🙂', '😍'];
+}
+
+function getNumberChoices(details: CsatCampaignDetails): number[] {
+  const configured = details.styling?.rating?.number as unknown;
+
+  if (typeof configured === 'number' && Number.isFinite(configured) && configured > 0) {
+    if (configured === 10) {
+      return Array.from({ length: 11 }, (_, index) => index);
+    }
+    return Array.from({ length: Math.floor(configured) }, (_, index) => index + 1);
+  }
+
+  if (configured && typeof configured === 'object') {
+    const min = Number((configured as Record<string, unknown>).min);
+    const max = Number((configured as Record<string, unknown>).max);
+
+    if (Number.isFinite(min) && Number.isFinite(max) && max >= min) {
+      const start = Math.floor(min);
+      const end = Math.floor(max);
+      return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+    }
+  }
+
+  return Array.from({ length: 11 }, (_, index) => index);
+}
+
+function getRatingMax(details: CsatCampaignDetails): number {
+  const ratingType = getRatingType(details);
+
+  if (ratingType === 'emoji') return Math.max(1, getEmojiChoices(details).length);
+  if (ratingType === 'number') {
+    const choices = getNumberChoices(details);
+    return Math.max(1, choices.length);
+  }
+
+  return FIVE_STAR_MAX;
+}
+
 const StarIcon: React.FC<{ fill: string; stroke: string }> = ({ fill, stroke }) => (
   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>
     <path
@@ -74,7 +139,8 @@ interface FormContentProps {
   onRate: (value: number) => void;
   onToggleOption: (option: string) => void;
   onCommentChange: (value: string) => void;
-  onSubmit: () => void;
+  onInlineSubmit: () => void;
+  canSubmit: boolean;
 }
 
 const CsatFormContent: React.FC<FormContentProps> = ({
@@ -87,15 +153,19 @@ const CsatFormContent: React.FC<FormContentProps> = ({
   onRate,
   onToggleOption,
   onCommentChange,
-  onSubmit,
+  onInlineSubmit,
+  canSubmit,
 }) => {
   const styling = details.styling || {};
   const feedbackPage = styling.feedbackPage || {};
   const ratingStyle = styling.rating || {};
   const initialFeedback = styling.initialFeedback || {};
+  const submitCta = feedbackPage.submitButton?.cta;
+  const ratingType = getRatingType(details);
+  const numberChoices = ratingType === 'number' ? getNumberChoices(details) : [];
+  const emojiChoices = ratingType === 'emoji' ? getEmojiChoices(details) : [];
 
   const selectedStarConfig = isHighRating ? ratingStyle.star?.high : ratingStyle.star?.low;
-  const submitAlign = getAlignment(feedbackPage.submitButton?.cta?.container?.alignment);
 
   return (
     <>
@@ -126,7 +196,7 @@ const CsatFormContent: React.FC<FormContentProps> = ({
       </div>
 
       <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
-        {Array.from({ length: FIVE_STAR_MAX }, (_, index) => {
+        {ratingType === 'star' && Array.from({ length: FIVE_STAR_MAX }, (_, index) => {
           const value = index + 1;
           const isSelected = value <= rating;
           const starContainerStyle = isSelected
@@ -158,6 +228,59 @@ const CsatFormContent: React.FC<FormContentProps> = ({
                 fill={starStyle?.background || (isSelected ? '#f59e0b' : '#e5e7eb')}
                 stroke={starStyle?.border || (isSelected ? '#d97706' : '#9ca3af')}
               />
+            </button>
+          );
+        })}
+
+        {ratingType === 'number' && numberChoices.map((value, index) => {
+          const selected = value === rating;
+          return (
+            <button
+              key={`${value}-${index}`}
+              onClick={() => onRate(value)}
+              style={{
+                border: `1px solid ${selected ? '#1d4ed8' : '#d1d5db'}`,
+                background: selected ? '#dbeafe' : '#ffffff',
+                color: selected ? '#1d4ed8' : '#111827',
+                borderRadius: 8,
+                minWidth: 36,
+                height: 36,
+                padding: '0 10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+              aria-label={`Rate ${value}`}
+            >
+              {value}
+            </button>
+          );
+        })}
+
+        {ratingType === 'emoji' && emojiChoices.map((emoji, index) => {
+          const value = index + 1;
+          const selected = value === rating;
+          return (
+            <button
+              key={`${emoji}-${index}`}
+              onClick={() => onRate(value)}
+              style={{
+                border: `1px solid ${selected ? '#1d4ed8' : '#d1d5db'}`,
+                background: selected ? '#dbeafe' : '#ffffff',
+                borderRadius: '999px',
+                width: 44,
+                height: 44,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: 22,
+              }}
+              aria-label={`Emoji rating ${index + 1}`}
+            >
+              {emoji}
             </button>
           );
         })}
@@ -200,71 +323,54 @@ const CsatFormContent: React.FC<FormContentProps> = ({
           )}
 
           {feedbackPage.additionalComments?.enabled && (
-            <textarea
-              value={comments}
-              onChange={(event) => onCommentChange(event.target.value)}
-              placeholder={feedbackPage.additionalComments?.placeholder || 'Tell us what we can improve'}
-              style={{
-                width: '100%',
-                boxSizing: 'border-box',
-                minHeight: 94,
-                height: 94,
-                maxHeight: 120,
-                marginTop: 12,
-                resize: 'none',
-                overflowY: 'auto',
-                border: `${feedbackPage.additionalComments?.borderWidth ?? 1}px solid ${feedbackPage.additionalComments?.colors?.border || '#d1d5db'}`,
-                background: feedbackPage.additionalComments?.colors?.background || '#ffffff',
-                color: feedbackPage.additionalComments?.colors?.text || '#111827',
-                borderRadius: 8,
-                padding: '12px',
-                ...(textStyleToCss(feedbackPage.additionalComments?.textStyle)),
-              }}
-            />
+            <>
+              <textarea
+                value={comments}
+                onChange={(event) => onCommentChange(event.target.value)}
+                placeholder={feedbackPage.additionalComments?.placeholder || 'Tell us what we can improve'}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  minHeight: 94,
+                  height: 94,
+                  maxHeight: 120,
+                  marginTop: 12,
+                  resize: 'none',
+                  overflowY: 'auto',
+                  border: `${feedbackPage.additionalComments?.borderWidth ?? 1}px solid ${feedbackPage.additionalComments?.colors?.border || '#d1d5db'}`,
+                  background: feedbackPage.additionalComments?.colors?.background || '#ffffff',
+                  color: feedbackPage.additionalComments?.colors?.text || '#111827',
+                  borderRadius: 8,
+                  padding: '12px',
+                  ...(textStyleToCss(feedbackPage.additionalComments?.textStyle)),
+                }}
+              />
+
+              <button
+                onClick={onInlineSubmit}
+                disabled={!canSubmit}
+                style={{
+                  marginTop: 10,
+                  width: '100%',
+                  height: submitCta?.container?.height || 45,
+                  border: `${submitCta?.container?.borderWidth ?? 0}px solid ${submitCta?.container?.borderColor || 'transparent'}`,
+                  background: submitCta?.container?.backgroundColor || '#111827',
+                  color: submitCta?.text?.color || '#ffffff',
+                  borderRadius: getCornerRadius(submitCta?.cornerRadius),
+                  fontFamily: applyFontFamily(submitCta?.text?.fontFamily),
+                  fontSize: submitCta?.text?.fontSize || 16,
+                  fontWeight: submitCta?.text?.fontDecoration?.includes('bold') ? 'bold' : 500,
+                  cursor: canSubmit ? 'pointer' : 'not-allowed',
+                  opacity: canSubmit ? 1 : 0.6,
+                }}
+              >
+                {feedbackPage.submitButton?.text || 'Submit'}
+              </button>
+            </>
           )}
         </>
       )}
 
-      {feedbackPage.submitButton?.enabled !== false && (
-        <div
-          style={{
-            marginTop: feedbackPage.submitButton?.cta?.margin?.top ?? 12,
-            marginBottom: feedbackPage.submitButton?.cta?.margin?.bottom ?? 0,
-            marginLeft: feedbackPage.submitButton?.cta?.margin?.left ?? 0,
-            marginRight: feedbackPage.submitButton?.cta?.margin?.right ?? 0,
-            display: 'flex',
-            justifyContent: submitAlign,
-            position: 'sticky',
-            bottom: 0,
-            zIndex: 5,
-            paddingTop: 10,
-            paddingBottom: 8,
-            background: 'inherit',
-            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-          }}
-        >
-          <button
-            onClick={onSubmit}
-            disabled={rating < 1}
-            style={{
-              width: feedbackPage.submitButton?.cta?.container?.ctaFullWidth ? '100%' : feedbackPage.submitButton?.cta?.container?.ctaWidth || 'auto',
-              height: feedbackPage.submitButton?.cta?.container?.height || 45,
-              border: `${feedbackPage.submitButton?.cta?.container?.borderWidth ?? 0}px solid ${feedbackPage.submitButton?.cta?.container?.borderColor || 'transparent'}`,
-              background: feedbackPage.submitButton?.cta?.container?.backgroundColor || '#111827',
-              color: feedbackPage.submitButton?.cta?.text?.color || '#ffffff',
-              borderRadius: getCornerRadius(feedbackPage.submitButton?.cta?.cornerRadius),
-              fontFamily: applyFontFamily(feedbackPage.submitButton?.cta?.text?.fontFamily),
-              fontSize: feedbackPage.submitButton?.cta?.text?.fontSize || 16,
-              fontWeight: feedbackPage.submitButton?.cta?.text?.fontDecoration?.includes('bold') ? 'bold' : 500,
-              cursor: rating < 1 ? 'not-allowed' : 'pointer',
-              opacity: rating < 1 ? 0.6 : 1,
-              padding: '0 16px',
-            }}
-          >
-            {feedbackPage.submitButton?.text || 'Submit'}
-          </button>
-        </div>
-      )}
     </>
   );
 };
@@ -398,8 +504,17 @@ export const Csat: React.FC = () => {
   const details = data.details;
   const styling = details.styling || {};
   const appearance = styling.appearance || {};
+  const feedbackPage = styling.feedbackPage || {};
+  const submitCta = feedbackPage.submitButton?.cta;
+  const submitAlign = getAlignment(submitCta?.container?.alignment);
+  const submitEnabled = feedbackPage.submitButton?.enabled !== false;
+  const rawSubmitHeight = Number(submitCta?.container?.height);
+  const submitHeight = Number.isFinite(rawSubmitHeight) && rawSubmitHeight > 0 ? rawSubmitHeight : 45;
+  const submitFooterSpace = submitHeight + 28;
 
-  const isHighRating = rating > LOW_RATING_THRESHOLD;
+  const ratingMax = getRatingMax(details);
+  const lowRatingThreshold = Math.max(1, Math.ceil(ratingMax * 0.6));
+  const isHighRating = rating > lowRatingThreshold;
 
   const cardWidthPercent = Math.max(50, Math.min(100, details.width ?? 80));
 
@@ -449,8 +564,9 @@ export const Csat: React.FC = () => {
           width: `min(1100px, ${cardWidthPercent}vw)`,
           maxWidth: '100%',
           minWidth: '280px',
+          minHeight: '240px',
           maxHeight: '75vh',
-          overflowY: 'auto',
+          overflow: 'hidden',
           backgroundColor: appearance.backgroundColor || '#2f6ef5',
           borderRadius: `${appearance.borderRadius ?? 12}px`,
           boxSizing: 'border-box',
@@ -464,6 +580,8 @@ export const Csat: React.FC = () => {
           marginLeft: asSpacingValue(appearance.margin?.left),
           pointerEvents: 'auto',
           boxShadow: '0 14px 36px rgba(0, 0, 0, 0.25)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {styling.crossButton?.enabled && (
@@ -477,25 +595,79 @@ export const Csat: React.FC = () => {
           />
         )}
 
-        {isSubmitted ? (
-          <CsatThankYouContent
-            details={details}
-            isHighRating={isHighRating}
-            onDone={handleDone}
-          />
-        ) : (
-          <CsatFormContent
-            details={details}
-            rating={rating}
-            selectedOptions={selectedOptions}
-            comments={comments}
-            isHighRating={isHighRating}
-            feedbackOptions={feedbackOptions}
-            onRate={setRating}
-            onToggleOption={handleToggleOption}
-            onCommentChange={setComments}
-            onSubmit={handleSubmit}
-          />
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            paddingBottom: !isSubmitted && submitEnabled ? submitFooterSpace : 8,
+          }}
+        >
+          {isSubmitted ? (
+            <CsatThankYouContent
+              details={details}
+              isHighRating={isHighRating}
+              onDone={handleDone}
+            />
+          ) : (
+            <CsatFormContent
+              details={details}
+              rating={rating}
+              selectedOptions={selectedOptions}
+              comments={comments}
+              isHighRating={isHighRating}
+              feedbackOptions={feedbackOptions}
+              onRate={setRating}
+              onToggleOption={handleToggleOption}
+              onCommentChange={setComments}
+              onInlineSubmit={handleSubmit}
+              canSubmit={rating >= 1}
+            />
+          )}
+        </div>
+
+        {!isSubmitted && submitEnabled && (
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              marginTop: submitCta?.margin?.top ?? 12,
+              marginBottom: submitCta?.margin?.bottom ?? 0,
+              marginLeft: submitCta?.margin?.left ?? 0,
+              marginRight: submitCta?.margin?.right ?? 0,
+              display: 'flex',
+              justifyContent: submitAlign,
+              paddingTop: 10,
+              paddingBottom: 8,
+              backgroundColor: appearance.backgroundColor || '#2f6ef5',
+              borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+              zIndex: 3,
+              pointerEvents: 'auto',
+            }}
+          >
+            <button
+              onClick={handleSubmit}
+              disabled={rating < 1}
+              style={{
+                width: submitCta?.container?.ctaFullWidth ? '100%' : submitCta?.container?.ctaWidth || 'auto',
+                height: submitHeight,
+                border: `${submitCta?.container?.borderWidth ?? 0}px solid ${submitCta?.container?.borderColor || 'transparent'}`,
+                background: submitCta?.container?.backgroundColor || '#111827',
+                color: submitCta?.text?.color || '#ffffff',
+                borderRadius: getCornerRadius(submitCta?.cornerRadius),
+                fontFamily: applyFontFamily(submitCta?.text?.fontFamily),
+                fontSize: submitCta?.text?.fontSize || 16,
+                fontWeight: submitCta?.text?.fontDecoration?.includes('bold') ? 'bold' : 500,
+                cursor: rating < 1 ? 'not-allowed' : 'pointer',
+                opacity: rating < 1 ? 0.6 : 1,
+                padding: '0 16px',
+              }}
+            >
+              {feedbackPage.submitButton?.text || 'Submit'}
+            </button>
+          </div>
         )}
       </div>
     </div>

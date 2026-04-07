@@ -448,10 +448,15 @@ interface CsatCampaignDetails {
             };
         };
         rating?: {
+            emoji?: string[] | Record<string, string> | string | null;
             highRatingSubtitle?: string;
             highRatingTitle?: string;
             lowRatingSubtitle?: string;
             lowRatingTitle?: string;
+            number?: number | {
+                min?: number;
+                max?: number;
+            } | null;
             ratingType?: string;
             star?: {
                 high?: {
