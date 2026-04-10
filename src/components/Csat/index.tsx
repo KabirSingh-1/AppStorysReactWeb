@@ -6,6 +6,7 @@ import CrossButton from '../common/CommonElements/CrossButton';
 import { CampaignCsat, CsatCampaignDetails, CsatSpacing, CsatTextStyle } from '../../types';
 
 const FIVE_STAR_MAX = 5;
+const LOW_RATING_CUTOFF = 3;
 
 function asSpacingValue(value?: number): string | undefined {
   if (value == null) return undefined;
@@ -82,27 +83,48 @@ function getEmojiChoices(details: CsatCampaignDetails): string[] {
 }
 
 function getNumberChoices(details: CsatCampaignDetails): number[] {
-  const configured = details.styling?.rating?.number as unknown;
+  // Force a 5-point numeric scale (1–5) regardless of backend config.
+  // This matches the requested UI and avoids rendering 0–10 style scales.
+  return Array.from({ length: 5 }, (_, index) => index + 1);
+}
 
-  if (typeof configured === 'number' && Number.isFinite(configured) && configured > 0) {
-    if (configured === 10) {
-      return Array.from({ length: 11 }, (_, index) => index);
-    }
-    return Array.from({ length: Math.floor(configured) }, (_, index) => index + 1);
+function asNonNegativeNumber(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value) && value >= 0) return value;
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+  }
+  return undefined;
+}
+
+function getNumberRatingGap(details: CsatCampaignDetails): number {
+  const rating = (details.styling?.rating as Record<string, unknown> | undefined) || undefined;
+  const directCandidates = [
+    rating?.['numberSpacing'],
+    rating?.['numberGap'],
+    rating?.['number_spacing'],
+    rating?.['number_gap'],
+    rating?.['spacingBetweenNumbers'],
+    rating?.['spaceBetweenNumbers'],
+    rating?.['numberOptionsSpacing'],
+  ];
+
+  for (const candidate of directCandidates) {
+    const maybe = asNonNegativeNumber(candidate);
+    if (maybe != null) return maybe;
   }
 
-  if (configured && typeof configured === 'object') {
-    const min = Number((configured as Record<string, unknown>).min);
-    const max = Number((configured as Record<string, unknown>).max);
-
-    if (Number.isFinite(min) && Number.isFinite(max) && max >= min) {
-      const start = Math.floor(min);
-      const end = Math.floor(max);
-      return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  const numberConfig = rating?.['number'];
+  if (numberConfig && typeof numberConfig === 'object') {
+    const obj = numberConfig as Record<string, unknown>;
+    const nestedCandidates = [obj['spacing'], obj['gap'], obj['optionsSpacing'], obj['numberSpacing'], obj['numberGap']];
+    for (const candidate of nestedCandidates) {
+      const maybe = asNonNegativeNumber(candidate);
+      if (maybe != null) return maybe;
     }
   }
 
-  return Array.from({ length: 11 }, (_, index) => index);
+  return 8;
 }
 
 function getRatingMax(details: CsatCampaignDetails): number {
@@ -167,6 +189,8 @@ const CsatFormContent: React.FC<FormContentProps> = ({
   const numberChoices = ratingType === 'number' ? getNumberChoices(details) : [];
   const emojiChoices = ratingType === 'emoji' ? getEmojiChoices(details) : [];
 
+  const numberGap = ratingType === 'number' ? getNumberRatingGap(details) : 8;
+
   const selectedStarConfig = isHighRating ? ratingStyle.star?.high : ratingStyle.star?.low;
 
   return (
@@ -197,7 +221,7 @@ const CsatFormContent: React.FC<FormContentProps> = ({
         </div>
       </div>
 
-      <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: ratingType === 'number' ? numberGap : 8, flexWrap: 'wrap' }}>
         {ratingType === 'star' && Array.from({ length: FIVE_STAR_MAX }, (_, index) => {
           const value = index + 1;
           const isSelected = value <= rating;
@@ -294,7 +318,7 @@ const CsatFormContent: React.FC<FormContentProps> = ({
         </div>
       )}
 
-      {rating > 0 && (
+      {rating > 0 && rating <= LOW_RATING_CUTOFF && (
         <>
           {feedbackOptions.length > 0 && (
             <div
@@ -335,29 +359,27 @@ const CsatFormContent: React.FC<FormContentProps> = ({
             </div>
           )}
 
-          {feedbackPage.additionalComments?.enabled && (
-            <textarea
-              value={comments}
-              onChange={(event) => onCommentChange(event.target.value)}
-              placeholder={feedbackPage.additionalComments?.placeholder || 'Tell us what we can improve'}
-              style={{
-                width: '100%',
-                boxSizing: 'border-box',
-                  minHeight: 56,
-                  height: 56,
-                  maxHeight: 64,
-                  marginTop: 8,
-                resize: 'none',
-                overflowY: 'auto',
-                border: `${feedbackPage.additionalComments?.borderWidth ?? 1}px solid ${feedbackPage.additionalComments?.colors?.border || '#d1d5db'}`,
-                background: feedbackPage.additionalComments?.colors?.background || '#ffffff',
-                color: feedbackPage.additionalComments?.colors?.text || '#111827',
-                borderRadius: 8,
-                padding: '12px',
-                ...(textStyleToCss(feedbackPage.additionalComments?.textStyle)),
-              }}
-            />
-          )}
+          <textarea
+            value={comments}
+            onChange={(event) => onCommentChange(event.target.value)}
+            placeholder={feedbackPage.additionalComments?.placeholder || 'Tell us what we can improve'}
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              minHeight: 56,
+              height: 56,
+              maxHeight: 64,
+              marginTop: 8,
+              resize: 'none',
+              overflowY: 'auto',
+              border: `${feedbackPage.additionalComments?.borderWidth ?? 1}px solid ${feedbackPage.additionalComments?.colors?.border || '#d1d5db'}`,
+              background: feedbackPage.additionalComments?.colors?.background || '#ffffff',
+              color: feedbackPage.additionalComments?.colors?.text || '#111827',
+              borderRadius: 8,
+              padding: '12px',
+              ...(textStyleToCss(feedbackPage.additionalComments?.textStyle)),
+            }}
+          />
 
           <div
             style={{
@@ -367,25 +389,28 @@ const CsatFormContent: React.FC<FormContentProps> = ({
               paddingTop: 6,
               paddingBottom: 6,
               background: appearance?.backgroundColor || '#2f6ef5',
+              display: 'flex',
+              justifyContent: 'center',
             }}
           >
             <button
-              onClick={onInlineSubmit}
+              onClick={() => onInlineSubmit()}
               disabled={!canSubmit}
               style={{
-                width: '100%',
-                minHeight: 36,
-                height: Math.max(36, Math.min(Number(submitCta?.container?.height) || 40, 42)),
+                width: Math.max(140, Math.min(asNonNegativeNumber(submitCta?.container?.ctaWidth) ?? 180, 220)),
+                maxWidth: '100%',
+                minHeight: 30,
+                height: Math.max(30, Math.min(Number(submitCta?.container?.height) || 34, 34)),
                 border: `${submitCta?.container?.borderWidth ?? 1}px solid ${submitCta?.container?.borderColor || '#ff7a00'}`,
                 background: submitCta?.container?.backgroundColor || '#ff2bc2',
                 color: submitCta?.text?.color || '#ffffff',
                 borderRadius: getCornerRadius(submitCta?.cornerRadius),
                 fontFamily: applyFontFamily(submitCta?.text?.fontFamily),
-                fontSize: submitCta?.text?.fontSize || 15,
+                fontSize: Math.min(Number(submitCta?.text?.fontSize) || 14, 14),
                 fontWeight: submitCta?.text?.fontDecoration?.includes('bold') ? 'bold' : 600,
                 cursor: canSubmit ? 'pointer' : 'not-allowed',
                 opacity: canSubmit ? 1 : 0.65,
-                padding: '0 16px',
+                padding: '0 12px',
               }}
             >
               {feedbackPage.submitButton?.text || 'Submit'}
@@ -528,27 +553,36 @@ export const Csat: React.FC = () => {
   const styling = details.styling || {};
   const appearance = styling.appearance || {};
 
-  const ratingMax = getRatingMax(details);
-  const lowRatingThreshold = Math.max(1, Math.ceil(ratingMax * 0.6));
-  const isHighRating = rating > lowRatingThreshold;
+  const isHighRating = rating > LOW_RATING_CUTOFF;
 
   const configuredWidth = Number(details.width ?? 80);
-  const compactCardWidth = Math.max(420, Math.min(760, configuredWidth * 8));
+  const compactCardWidth = Math.max(660, Math.min(1080, configuredWidth * 10));
 
   const handleToggleOption = (option: string) => {
     setSelectedOptions((prev) => (prev.includes(option) ? prev.filter((item) => item !== option) : [...prev, option]));
   };
 
-  const handleSubmit = async () => {
-    if (rating < 1) return;
+  const handleSubmit = async (override?: { rating?: number; options?: string[]; comments?: string }) => {
+    const ratingValue = override?.rating ?? rating;
+    if (ratingValue < 1) return;
     setIsSubmitted(true);
 
     void trackEvent('csat captured', data.id, {
-      rating,
-      options: selectedOptions,
-      comments,
+      rating: ratingValue,
+      options: override?.options ?? selectedOptions,
+      comments: override?.comments ?? comments,
       campaign_type: 'CSAT',
     });
+  };
+
+  const handleRate = (value: number) => {
+    setRating(value);
+
+    if (value > LOW_RATING_CUTOFF) {
+      setSelectedOptions([]);
+      setComments('');
+      void handleSubmit({ rating: value, options: [], comments: '' });
+    }
   };
 
   const handleDone = () => {
@@ -578,11 +612,11 @@ export const Csat: React.FC = () => {
       <div
         style={{
           position: 'relative',
-          width: `min(${compactCardWidth}px, 94vw)`,
-          maxWidth: '94vw',
+          width: `min(${compactCardWidth}px, 96vw)`,
+          maxWidth: '96vw',
           minWidth: '320px',
-          minHeight: '260px',
-          maxHeight: '70vh',
+          minHeight: '220px',
+          maxHeight: '55vh',
           overflow: 'hidden',
           backgroundColor: appearance.backgroundColor || '#2f6ef5',
           borderRadius: `${appearance.borderRadius ?? 12}px`,
@@ -649,7 +683,7 @@ export const Csat: React.FC = () => {
               comments={comments}
               isHighRating={isHighRating}
               feedbackOptions={feedbackOptions}
-              onRate={setRating}
+              onRate={handleRate}
               onToggleOption={handleToggleOption}
               onCommentChange={setComments}
               onInlineSubmit={handleSubmit}

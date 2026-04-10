@@ -40,6 +40,10 @@ const CsatComponent =
   (AppStorysSDK as any).Csat?.default ??
   (AppStorysSDK as any).Csat;
 
+const SurveyComponent =
+  (AppStorysSDK as any).Survey?.default ??
+  (AppStorysSDK as any).Survey;
+
 
 function App() {
   const [showTooltipDashboard, setShowTooltipDashboard] = useState(false);
@@ -113,6 +117,7 @@ function App() {
       {TooltipComponent ? <TooltipComponent /> : null}
       {BottomSheetComponent ? <BottomSheetComponent /> : null}
       {CsatComponent ? <CsatComponent /> : null}
+      {SurveyComponent ? <SurveyComponent /> : null}
       <Footer />
 
       {/* Toggle Button */}

@@ -340,6 +340,124 @@ export interface CampaignBottomSheet extends BaseCampaign {
   };
 }
 
+export interface SurveyTextStyle {
+  color?: string;
+  fontDecoration?: string[];
+  fontFamily?: string;
+  fontSize?: number;
+  textAlign?: string;
+  margin?: {
+    bottom?: number;
+    left?: number;
+    right?: number;
+    top?: number;
+  };
+  borderwidth?: number;
+}
+
+export interface SurveyOptionColors {
+  background?: string;
+  border?: string;
+  text?: string;
+}
+
+export interface SurveyOptionStyle {
+  colors?: SurveyOptionColors;
+  textStyle?: SurveyTextStyle;
+}
+
+export interface SurveySlideLogicRule {
+  redirectTo?: string;
+  selectOption?: string[];
+}
+
+export interface SurveySlide {
+  additionalComment?: {
+    enabled?: boolean;
+    placeholder?: string;
+  };
+  id: string;
+  logic?: SurveySlideLogicRule[];
+  options?: Record<string, string>;
+  order: number;
+  parent: string;
+  question?: string;
+  submitButtonText?: string;
+  subtitle?: string;
+  title?: string;
+}
+
+export interface SurveyThankYouButtonConfig {
+  action?: string;
+  enabled?: boolean;
+  redirectUrl?: string;
+}
+
+export interface SurveyCampaignDetails {
+  id: string;
+  name?: string;
+  slides?: SurveySlide[];
+  styling?: {
+    appearance?: {
+      backdropColor?: string;
+      backdropOpacity?: number;
+      backgroundColor?: string;
+      cornerRadius?: {
+        topLeft?: number;
+        topRight?: number;
+        bottomLeft?: number;
+        bottomRight?: number;
+      };
+      displayDelay?: number;
+    };
+    content?: {
+      isIntroductionPage?: boolean;
+      isThankyouPage?: boolean;
+    };
+    crossButton?: CrossButtonConfig;
+    cta?: StorySlideCta;
+    options?: {
+      additionalComments?: SurveyOptionStyle;
+      bulletSpacing?: number;
+      cornerRadius?: StorySlideCtaBorderRadius;
+      nonSelectedOptions?: SurveyOptionStyle;
+      optionListStyle?: string;
+      optionsHeight?: number;
+      optionsSpacing?: number;
+      selectedOptions?: SurveyOptionStyle;
+    };
+    subtitle?: {
+      textStyle?: SurveyTextStyle;
+    };
+    thankyouPage?: {
+      cta?: StorySlideCta;
+      imageStyle?: {
+        height?: number;
+        width?: number;
+      };
+      subtitle?: {
+        textStyle?: SurveyTextStyle;
+      };
+      title?: {
+        textStyle?: SurveyTextStyle;
+      };
+    };
+    title?: {
+      textStyle?: SurveyTextStyle;
+    };
+  };
+  thankYouButtonConfig?: SurveyThankYouButtonConfig;
+  thankYouButtonText?: string;
+  thankYouImage?: string;
+  thankYouText?: string;
+  thankYouTitle?: string;
+}
+
+export interface CampaignSurvey extends BaseCampaign {
+  campaign_type: 'SUR';
+  details: SurveyCampaignDetails;
+}
+
 export interface CsatTextStyle {
   color?: string;
   fontDecoration?: string[];
@@ -484,7 +602,7 @@ export interface CampaignCsat extends BaseCampaign {
   details: CsatCampaignDetails;
 }
 
-export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | CampaignCsat | BaseCampaign;
+export type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | CampaignCsat | CampaignSurvey | BaseCampaign;
 
 export interface InitializationOptions {
   appId: string;

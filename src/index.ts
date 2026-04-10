@@ -156,8 +156,9 @@ import { Widget } from './components/Widget';
 import Tooltip from './components/Tooltip';
 import { BottomSheet } from './components/BottomSheet';
 import Csat from './components/Csat';
+import Survey from './components/Survey';
 
 const instance = new AppStorys();
-export { instance as AppStorys, Banner, Story, Pip, Widget, Floater, Tooltip, BottomSheet, Csat, personalizeText };
+export { instance as AppStorys, Banner, Story, Pip, Widget, Floater, Tooltip, BottomSheet, Csat, Survey, personalizeText };
 export * from './types';
 

@@ -359,6 +359,116 @@ interface CampaignBottomSheet extends BaseCampaign {
         name: string;
     };
 }
+interface SurveyTextStyle {
+    color?: string;
+    fontDecoration?: string[];
+    fontFamily?: string;
+    fontSize?: number;
+    textAlign?: string;
+    margin?: {
+        bottom?: number;
+        left?: number;
+        right?: number;
+        top?: number;
+    };
+    borderwidth?: number;
+}
+interface SurveyOptionColors {
+    background?: string;
+    border?: string;
+    text?: string;
+}
+interface SurveyOptionStyle {
+    colors?: SurveyOptionColors;
+    textStyle?: SurveyTextStyle;
+}
+interface SurveySlideLogicRule {
+    redirectTo?: string;
+    selectOption?: string[];
+}
+interface SurveySlide {
+    additionalComment?: {
+        enabled?: boolean;
+        placeholder?: string;
+    };
+    id: string;
+    logic?: SurveySlideLogicRule[];
+    options?: Record<string, string>;
+    order: number;
+    parent: string;
+    question?: string;
+    submitButtonText?: string;
+    subtitle?: string;
+    title?: string;
+}
+interface SurveyThankYouButtonConfig {
+    action?: string;
+    enabled?: boolean;
+    redirectUrl?: string;
+}
+interface SurveyCampaignDetails {
+    id: string;
+    name?: string;
+    slides?: SurveySlide[];
+    styling?: {
+        appearance?: {
+            backdropColor?: string;
+            backdropOpacity?: number;
+            backgroundColor?: string;
+            cornerRadius?: {
+                topLeft?: number;
+                topRight?: number;
+                bottomLeft?: number;
+                bottomRight?: number;
+            };
+            displayDelay?: number;
+        };
+        content?: {
+            isIntroductionPage?: boolean;
+            isThankyouPage?: boolean;
+        };
+        crossButton?: CrossButtonConfig;
+        cta?: StorySlideCta;
+        options?: {
+            additionalComments?: SurveyOptionStyle;
+            bulletSpacing?: number;
+            cornerRadius?: StorySlideCtaBorderRadius;
+            nonSelectedOptions?: SurveyOptionStyle;
+            optionListStyle?: string;
+            optionsHeight?: number;
+            optionsSpacing?: number;
+            selectedOptions?: SurveyOptionStyle;
+        };
+        subtitle?: {
+            textStyle?: SurveyTextStyle;
+        };
+        thankyouPage?: {
+            cta?: StorySlideCta;
+            imageStyle?: {
+                height?: number;
+                width?: number;
+            };
+            subtitle?: {
+                textStyle?: SurveyTextStyle;
+            };
+            title?: {
+                textStyle?: SurveyTextStyle;
+            };
+        };
+        title?: {
+            textStyle?: SurveyTextStyle;
+        };
+    };
+    thankYouButtonConfig?: SurveyThankYouButtonConfig;
+    thankYouButtonText?: string;
+    thankYouImage?: string;
+    thankYouText?: string;
+    thankYouTitle?: string;
+}
+interface CampaignSurvey extends BaseCampaign {
+    campaign_type: 'SUR';
+    details: SurveyCampaignDetails;
+}
 interface CsatTextStyle {
     color?: string;
     fontDecoration?: string[];
@@ -526,7 +636,7 @@ interface CampaignCsat extends BaseCampaign {
     campaign_type: 'CSAT';
     details: CsatCampaignDetails;
 }
-type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | CampaignCsat | BaseCampaign;
+type Campaign = CampaignBanner | CampaignStory | CampaignWidget | CampaignTooltip | CampaignBottomSheet | CampaignCsat | CampaignSurvey | BaseCampaign;
 interface InitializationOptions {
     appId: string;
     accountId: string;
@@ -554,6 +664,8 @@ declare const BottomSheet: React.FC;
 
 declare const Csat: React.FC;
 
+declare const Survey: React.FC;
+
 declare class AppStorys {
     private state;
     private navigateToScreen?;
@@ -579,4 +691,4 @@ declare class AppStorys {
 
 declare const instance: AppStorys;
 
-export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, BottomSheet, type BottomSheetElement, type Campaign, type CampaignBanner, type CampaignBottomSheet, type CampaignCsat, type CampaignStory, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Csat, type CsatCampaignDetails, type CsatSpacing, type CsatTextStyle, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
+export { instance as AppStorys, type AppStorysStore, type Attributes, Banner, type BaseCampaign, BottomSheet, type BottomSheetElement, type Campaign, type CampaignBanner, type CampaignBottomSheet, type CampaignCsat, type CampaignStory, type CampaignSurvey, type CampaignTooltip, type CampaignType, type CampaignWidget, type CrossButtonConfig, Csat, type CsatCampaignDetails, type CsatSpacing, type CsatTextStyle, Floater, type InitializationOptions, Pip, SdkState, Story, type StoryGroupStyling, type StorySlide, type StorySlideCta, type StorySlideCtaBorderRadius, type StorySlideCtaContainer, type StorySlideCtaText, type StorySlideStyling, Survey, type SurveyCampaignDetails, type SurveyOptionColors, type SurveyOptionStyle, type SurveySlide, type SurveySlideLogicRule, type SurveyTextStyle, type SurveyThankYouButtonConfig, Tooltip, type TooltipItem, type TooltipStyling, type TriggerEvent, type TriggerEventConfig, type TriggerEventObject, Widget, type WidgetImage, personalizeText };
