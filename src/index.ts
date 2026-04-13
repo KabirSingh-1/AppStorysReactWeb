@@ -9,6 +9,7 @@ import setUserProperties from './core/setUserProperties';
 import { personalizeText } from './core/personalization';
 import fetchAllCampaigns from './core/fetchAllCampaigns';
 import useAppStorysStore from './core/store';
+import { getAccessToken } from './core/store';
 import reconcileAnonymousUser from './core/reconcileUser';
 import { exitIntentManager } from './core/exitIntent';
 import { visibilityManager } from './core/visibilityManager';
@@ -65,6 +66,42 @@ class AppStorys {
         }
       }
 
+      // Fire a non-blocking call to track-user-res so it appears in the browser Network tab
+      try {
+        const accessToken = await getAccessToken();
+        const usersBase = options.baseUrl || 'https://users.appstorys.co';
+        // Fire-and-handle response to update store flags (do not block init)
+        fetch(`${usersBase}/v2/${accountId}/track-user-res`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({
+            user_id: finalUserId,
+            screenName: (typeof window !== 'undefined' && window.location && window.location.pathname) ? window.location.pathname : '',
+            silentUpdate: true,
+          }),
+        })
+            .then(async (resp) => {
+              if (!resp.ok) return;
+              try {
+                const data = await resp.json();
+                const s = useAppStorysStore.getState();
+                if (typeof data.screen_capture_enabled !== 'undefined') {
+                  const val = Boolean(data.screen_capture_enabled);
+                  console.info('AppStorys: track-user-res returned screen_capture_enabled=', val);
+                  s.setScreenCaptureEnabled(val);
+                }
+              } catch (e) {
+                /* ignore */
+              }
+            })
+          .catch((err) => console.warn('track-user-res (init) failed', err));
+      } catch (err) {
+        console.warn('track-user-res (init) setup failed', err);
+      }
+
       const { campaigns, version } = await fetchAllCampaigns(accountId);
 
       const state = useAppStorysStore.getState();
@@ -76,6 +113,18 @@ class AppStorys {
       state.setTrackingUrl(options.trackingUrl);
       state.saveAllCampaigns(campaigns);
       state.setCampaignVersion(version);
+
+      // After campaigns and store are populated, mount screen-capture button if enabled
+      try {
+        const s = useAppStorysStore.getState();
+        if (s.screenCaptureEnabled) {
+          const scModule = await import('./core/screenCapture');
+          scModule.mountScreenCaptureButton();
+        }
+      } catch (err) {
+        // mounting failure shouldn't block initialization
+        console.warn('Failed to mount screen capture button', err);
+      }
 
       // Initialize Exit Intent / Back Press listeners
       exitIntentManager.setup();

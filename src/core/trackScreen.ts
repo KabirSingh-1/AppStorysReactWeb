@@ -40,6 +40,11 @@ export default async function trackScreen(screenName: string) {
 
     const data = await response.json();
 
+    // Update screen-capture flag from response
+    if (typeof data.screen_capture_enabled !== 'undefined') {
+      state.setScreenCaptureEnabled(Boolean(data.screen_capture_enabled));
+    }
+
     // Handle variants
     if (data.variants && data.variants.length > 0) {
       const variantMappings: Record<string, string> = {};

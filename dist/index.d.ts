@@ -89,6 +89,7 @@ interface AppStorysStore {
     isAnonymousUser: boolean;
     variantMappings: Record<string, string>;
     personalizationData: Record<string, string>;
+    screenCaptureEnabled?: boolean;
     baseUrl?: string;
     trackingUrl?: string;
 }
