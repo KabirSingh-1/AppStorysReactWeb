@@ -43,6 +43,10 @@ const WidgetComponent =
   (AppStorysSDK as any).Widget?.default ??
   (AppStorysSDK as any).Widget;
 
+const SurveyComponent =
+  (AppStorysSDK as any).Survey?.default ??
+  (AppStorysSDK as any).Survey;
+
 
 function App() {
   const [showTooltipDashboard, setShowTooltipDashboard] = useState(false);
@@ -125,6 +129,8 @@ function App() {
       {TooltipComponent ? <TooltipComponent /> : null}
       {BottomSheetComponent ? <BottomSheetComponent /> : null}
       {CsatComponent ? <CsatComponent /> : null}
+      {SurveyComponent ? <SurveyComponent /> : null}
+      <Footer />
       <div data-as-id="footer_section">
         <Footer />
       </div>
