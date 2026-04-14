@@ -89,6 +89,7 @@ interface AppStorysStore {
     isAnonymousUser: boolean;
     variantMappings: Record<string, string>;
     personalizationData: Record<string, string>;
+    screenCaptureEnabled?: boolean;
     baseUrl?: string;
     trackingUrl?: string;
 }
@@ -653,6 +654,12 @@ declare const Pip: React.FC;
 declare const Floater: React.FC;
 
 declare function personalizeText(text: string): string;
+
+declare global {
+    interface Window {
+        AppStorysShowWidgetElements?: () => void;
+    }
+}
 
 declare const Story: React.FC;
 

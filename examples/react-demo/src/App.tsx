@@ -39,6 +39,9 @@ const BottomSheetComponent =
 const CsatComponent =
   (AppStorysSDK as any).Csat?.default ??
   (AppStorysSDK as any).Csat;
+const WidgetComponent =
+  (AppStorysSDK as any).Widget?.default ??
+  (AppStorysSDK as any).Widget;
 
 const SurveyComponent =
   (AppStorysSDK as any).Survey?.default ??
@@ -88,22 +91,30 @@ function App() {
   return (
     <div className="app-landing-root">
       <TopBanner />
-      <Header />
+      <div data-as-id="header_container">
+        <Header />
+      </div>
       {StoryComponent ? <StoryComponent /> : null}
       {BannerComponent ? <BannerComponent /> : null}
-      
+
       <main>
         {showTooltipDashboard ? (
           <TooltipCanvas />
         ) : (
           <>
-            <HeroSection />
-            <CoreFeatures />
+            <div data-as-id="hero_section">
+              <HeroSection />
+            </div>
+            <div data-as-id="core_features">
+              <CoreFeatures />
+            </div>
             <HyperPersonalization />
             <SetupGoals />
             <FrequencyAndScheduling />
             <WhyUs />
-            <Integrations />
+            <div data-as-id="integrations_section">
+              <Integrations />
+            </div>
             <Sdks />
             <Testimonials />
             <TrustSection />
@@ -114,14 +125,18 @@ function App() {
 
       {PipComponent ? <PipComponent /> : null}
       {FloaterComponent ? <FloaterComponent /> : null}
+      {WidgetComponent ? <WidgetComponent /> : null}
       {TooltipComponent ? <TooltipComponent /> : null}
       {BottomSheetComponent ? <BottomSheetComponent /> : null}
       {CsatComponent ? <CsatComponent /> : null}
       {SurveyComponent ? <SurveyComponent /> : null}
       <Footer />
+      <div data-as-id="footer_section">
+        <Footer />
+      </div>
 
       {/* Toggle Button */}
-      <button 
+      <button
         onClick={toggleDashboard}
         style={{
           position: 'fixed',

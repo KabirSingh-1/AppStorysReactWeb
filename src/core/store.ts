@@ -17,6 +17,7 @@ export interface AppStorysActions {
   setIsAnonymousUser: (isAnonymous: boolean) => void;
   setVariantMappings: (mappings: Record<string, string>) => void;
   setPersonalizationData: (data: Record<string, string>) => void;
+  setScreenCaptureEnabled: (enabled: boolean) => void;
   setBaseUrl: (baseUrl?: string) => void;
   setTrackingUrl: (trackingUrl?: string) => void;
 }
@@ -35,6 +36,7 @@ const useAppStorysStore = create<AppStorysStore & AppStorysActions>((set) => ({
   isAnonymousUser: false,
   variantMappings: {},
   personalizationData: {},
+  screenCaptureEnabled: false,
   baseUrl: undefined,
   trackingUrl: undefined,
   
@@ -52,6 +54,7 @@ const useAppStorysStore = create<AppStorysStore & AppStorysActions>((set) => ({
   setIsAnonymousUser: (isAnonymousUser: boolean) => set({ isAnonymousUser }),
   setVariantMappings: (variantMappings: Record<string, string>) => set({ variantMappings }),
   setPersonalizationData: (personalizationData: Record<string, string>) => set({ personalizationData }),
+  setScreenCaptureEnabled: (enabled: boolean) => set({ screenCaptureEnabled: enabled }),
   setBaseUrl: (baseUrl?: string) => set({ baseUrl }),
   setTrackingUrl: (trackingUrl?: string) => set({ trackingUrl }),
 }));
