@@ -14,6 +14,7 @@ import reconcileAnonymousUser from './core/reconcileUser';
 import { exitIntentManager } from './core/exitIntent';
 import { visibilityManager } from './core/visibilityManager';
 import { getOrCreateAnonymousUserId, getStoredAnonymousUserId, clearAnonymousUserId } from './core/userManagement';
+import './dev/showWidgetDebug';
 
 class AppStorys {
   private state: SdkState = SdkState.uninitialized;

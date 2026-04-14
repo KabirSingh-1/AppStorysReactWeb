@@ -7,6 +7,7 @@ export const BACK_PRESS_SENTINEL = '__back_press_triggered__';
 
 interface UseCampaignsOptions {
   position?: string;
+  screenContains?: string;
 }
 
 function normalizeScreenName(screen?: string | null): string {
@@ -133,4 +134,34 @@ export default function useCampaigns<T extends Campaign>(campaignType: string, o
     },
     [campaigns, allCampaigns, trackedEvents, trackedEventMetadata, variantMappings, campaignType, options, currentScreen],
   );
+}
+
+export function useCampaignsList<T extends Campaign>(campaignType: string, options?: UseCampaignsOptions): T[] {
+  const currentScreen = useAppStorysStore((state) => state.currentScreen);
+  const campaigns = useAppStorysStore((state) => state.campaigns);
+  const allCampaigns = useAppStorysStore((state) => state.allCampaigns);
+  const trackedEvents = useAppStorysStore((state) => state.trackedEvents);
+  const trackedEventMetadata = useAppStorysStore((state) => state.trackedEventMetadata);
+
+  return useMemo(() => {
+    const list = (campaigns && campaigns.length > 0) ? campaigns : (allCampaigns || []);
+
+    const filtered = list.filter((campaign) => {
+      if (campaign.campaign_type !== campaignType) return false;
+      if (options?.position && campaign.position !== options.position) return false;
+      if (!isTriggerEventSatisfied(campaign, trackedEvents, trackedEventMetadata)) return false;
+
+      // If caller passed a screenContains option, match substring (case-insensitive)
+      if (options?.screenContains) {
+        const needle = (options.screenContains || '').trim().toLowerCase();
+        const cs = (campaign.screen || '').trim().toLowerCase();
+        return cs.includes(needle);
+      }
+
+      // Fallback to existing screen matching logic
+      return isScreenMatch(campaign.screen, currentScreen);
+    });
+
+    return filtered.map((c) => resolveCampaignVariant(c) as T) as T[];
+  }, [campaigns, allCampaigns, trackedEvents, trackedEventMetadata, campaignType, options, currentScreen]);
 }

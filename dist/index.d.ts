@@ -545,6 +545,12 @@ declare const Floater: React.FC;
 
 declare function personalizeText(text: string): string;
 
+declare global {
+    interface Window {
+        AppStorysShowWidgetElements?: () => void;
+    }
+}
+
 declare const Story: React.FC;
 
 declare const Widget: React.FC;
