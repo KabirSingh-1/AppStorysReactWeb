@@ -663,7 +663,17 @@ declare global {
 
 declare const Story: React.FC;
 
-declare const Widget: React.FC;
+interface WidgetProps {
+    position?: string;
+}
+/**
+ * Simple web widget component mirroring RN Widgets.tsx implementation
+ * - Accepts optional position prop
+ * - Fetches single campaign via useCampaigns hook
+ * - Renders carousel with auto-advance (full) or manual scroll (half)
+ * - Portals into host element if position target found
+ */
+declare const Widget: React.FC<WidgetProps>;
 
 declare const Tooltip: React.FC;
 

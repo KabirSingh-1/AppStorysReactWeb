@@ -20,21 +20,18 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoAdvanceRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  if (!data) {
-    return null;
-  }
-
-  const { details } = data;
-  const images = details.widget_images || [];
+  // Derived values (must be declared unconditionally so hooks stay stable)
+  const details = data?.details || ({} as any);
+  const images = (details.widget_images || []) as any[];
   const styling = details.styling || {};
   const widgetType = details.type || 'full';
   const isHalf = widgetType === 'half';
 
-  // Track widget impression
+  // Track widget impression (safe when `data` is undefined)
   useEffect(() => {
+    if (!data?.id) return;
     void trackEvent('widget_viewed', data.id);
-  }, [data.id]);
+  }, [data?.id]);
 
   // Auto-advance full widgets every 5 seconds
   useEffect(() => {
@@ -48,14 +45,15 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
 
       return () => {
         if (autoAdvanceRef.current) {
-          clearInterval(autoAdvanceRef.current);
+          clearInterval(autoAdvanceRef.current as any);
         }
       };
     }
+    return undefined;
   }, [widgetType, images.length]);
 
   const handleClick = (imageId: string, link: string) => {
-    void trackEvent('clicked', data.id, { widget_image: imageId });
+    if (data?.id) void trackEvent('clicked', data.id, { widget_image: imageId });
     if (link) {
       if (link.startsWith('http')) {
         window.open(link, '_blank');
@@ -128,7 +126,7 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
       >
         {isHalf
           ? // Half: show all images (2 per row with horizontal scroll)
-            images.map((img, idx) => (
+            images.map((img: any, idx: number) => (
               <div key={img.id} style={getItemStyle(idx)}>
                 <img
                   src={img.image}
@@ -155,9 +153,7 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
                     objectFit: 'cover',
                     display: 'block',
                   }}
-                  onClick={() =>
-                    handleClick(images[activeIndex].id, images[activeIndex].link)
-                  }
+                  onClick={() => handleClick(images[activeIndex].id, images[activeIndex].link)}
                 />
               </div>
             )}
@@ -172,7 +168,7 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
           marginTop: '8px',
           width: '100%'
         }}>
-          {images.map((_, i) => (
+          {images.map((_: any, i: number) => (
             <div
               key={i}
               style={{
@@ -191,8 +187,8 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
 
   // Try to find host element if position is declared (mirror RN behavior)
   let target: Element | null = null;
-  if (data.position) {
-    const key = String(data.position).replace(/^widget_/, '');
+  if (data?.position) {
+    const key = String(data.position || '').replace(/^widget_/, '');
     const selectors = [
       `[data-as-id="${key}"]`,
       `#${key}`,
@@ -205,7 +201,7 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
         const el = document.querySelector(sel);
         if (el) {
           target = el;
-          console.log('[Widget] Portal target found:', sel, 'for campaign', data.id);
+          console.log('[Widget] Portal target found:', sel, 'for campaign', data?.id);
           break;
         }
       } catch (e) {
@@ -214,7 +210,7 @@ export const Widget: React.FC<WidgetProps> = ({ position }) => {
     }
 
     if (!target) {
-      console.log('[Widget] No portal target found for position:', data.position, 'rendering inline for campaign:', data.id);
+      console.log('[Widget] No portal target found for position:', data?.position, 'rendering inline for campaign:', data?.id);
     }
   }
 
