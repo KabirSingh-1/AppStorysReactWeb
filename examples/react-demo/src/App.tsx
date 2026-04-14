@@ -130,7 +130,6 @@ function App() {
       {BottomSheetComponent ? <BottomSheetComponent /> : null}
       {CsatComponent ? <CsatComponent /> : null}
       {SurveyComponent ? <SurveyComponent /> : null}
-      <Footer />
       <div data-as-id="footer_section">
         <Footer />
       </div>
