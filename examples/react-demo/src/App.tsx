@@ -39,6 +39,9 @@ const BottomSheetComponent =
 const CsatComponent =
   (AppStorysSDK as any).Csat?.default ??
   (AppStorysSDK as any).Csat;
+const WidgetComponent =
+  (AppStorysSDK as any).Widget?.default ??
+  (AppStorysSDK as any).Widget;
 
 
 function App() {
@@ -118,6 +121,7 @@ function App() {
 
       {PipComponent ? <PipComponent /> : null}
       {FloaterComponent ? <FloaterComponent /> : null}
+      {WidgetComponent ? <WidgetComponent /> : null}
       {TooltipComponent ? <TooltipComponent /> : null}
       {BottomSheetComponent ? <BottomSheetComponent /> : null}
       {CsatComponent ? <CsatComponent /> : null}

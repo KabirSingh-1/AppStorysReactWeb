@@ -1,5 +1,6 @@
 import { getAccessToken, getUserId } from './store';
 import verifyAccount from './verifyAccount';
+import identifyWidgetPositions from './identifyWidgetPositions';
 import useAppStorysStore from './store';
 
 type LayoutFrame = {
@@ -14,6 +15,91 @@ type LayoutFrame = {
 type LayoutInfo = { id: string; frame: LayoutFrame };
 
 const layoutData: Record<string, LayoutInfo[]> = {};
+
+function normalizeWidgetId(id?: string) {
+  if (!id) return id;
+  return id.startsWith('widget_') ? id : `widget_${id}`;
+}
+
+function extractPositionsFromCampaigns(): string[] {
+  try {
+    const all = useAppStorysStore.getState().allCampaigns || [];
+    const positions: string[] = [];
+
+    all.forEach((c: any) => {
+      if (c && c.position && typeof c.position === 'string') {
+        positions.push(String(c.position));
+      }
+
+      try {
+        if (c && c.campaign_type === 'WID' && c.details) {
+          const d = c.details;
+          if (typeof d === 'object') {
+            if (d.id && typeof d.id === 'string') positions.push(String(d.id));
+            if (d.variants && typeof d.variants === 'object') {
+              Object.values(d.variants).forEach((v: any) => { if (v && v.id && typeof v.id === 'string') positions.push(String(v.id)); });
+            }
+          }
+        }
+      } catch (e) {
+        // ignore per-campaign extraction errors
+      }
+    });
+
+    return positions.filter((v): v is string => !!v).map((p) => normalizeWidgetId(String(p))!).filter((v): v is string => !!v);
+  } catch (e) {
+    return [];
+  }
+}
+function mapServerPositionsToDOM(screenName: string) {
+  try {
+    const positions = extractPositionsFromCampaigns();
+    if (!positions || positions.length === 0) return [];
+
+    const mapped: string[] = [];
+
+    positions.forEach((pos) => {
+      const key = pos.replace(/^widget_/, '');
+      // try multiple selectors to find the matching element
+      const selectors = [
+        `[data-as-id="${key}"]`,
+        `#${key}`,
+        `.${key}`,
+        `[data-widget="${key}"]`,
+      ];
+
+      let el: Element | null = null;
+      for (const sel of selectors) {
+        el = document.querySelector(sel);
+        if (el) break;
+      }
+
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const frame: LayoutFrame = {
+          x: Math.round(rect.left),
+          y: Math.round(rect.top),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+          screenWidth: window.innerWidth,
+          screenHeight: window.innerHeight,
+        };
+
+        // store using the raw key (no widget_ prefix) so children JSON matches collected ids
+        CaptureService.addLayoutInfo(screenName, key, frame);
+        mapped.push(key);
+      } else {
+        // not found in DOM; skip
+      }
+    });
+
+    console.info('AppStorys: mapServerPositionsToDOM mapped', mapped.length, 'server positions to DOM elements', mapped);
+    return mapped;
+  } catch (e) {
+    console.warn('AppStorys: mapServerPositionsToDOM error', e);
+    return [];
+  }
+}
 
 function ensureList(screenName: string) {
   if (!layoutData[screenName]) layoutData[screenName] = [];
@@ -133,6 +219,14 @@ export default class CaptureService {
 
       // ── Step 0: Auto-collect elements before capture ──────────────────
       this.collectElements(screenName);
+
+      // Also try to map server-declared widget positions to DOM elements
+      try {
+        const mapped = mapServerPositionsToDOM(screenName);
+        if (mapped && mapped.length > 0) console.info('AppStorys: mapServerPositionsToDOM added', mapped.length, 'elements');
+      } catch (e) {
+        /* ignore */
+      }
 
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -264,6 +358,28 @@ export default class CaptureService {
       }
 
       console.info('AppStorys: identify-elements success ✓');
+
+      // After identify-elements succeeds, call identifyWidgetPositions.
+      // If caller didn't provide a `positionList`, derive it from collected layout data.
+      try {
+        let positionsToSend = positionList;
+        let normalized: string[] = [];
+        if (!positionsToSend || positionsToSend.length === 0) {
+          const data = this.getLayoutData(screenName) || [];
+          normalized = data.map(d => normalizeWidgetId(d.id)).filter((v): v is string => !!v);
+        } else {
+          normalized = positionsToSend.map(id => normalizeWidgetId(id)).filter((v): v is string => !!v);
+        }
+
+        // Merge with server-declared positions (dedupe)
+        const serverPositions = extractPositionsFromCampaigns();
+        const combined = Array.from(new Set<string>([...normalized, ...serverPositions]));
+        console.info('AppStorys: identifyWidgetPositions will send', combined.length, 'positions (collected + server)', combined);
+        await identifyWidgetPositions(screenName, combined);
+      } catch (e) {
+        console.warn('AppStorys: identifyWidgetPositions failed', e);
+      }
+
       return true;
     } catch (err) {
       console.error('AppStorys: takeScreenshot error', err);
@@ -273,3 +389,29 @@ export default class CaptureService {
 }
 
 export type { LayoutFrame, LayoutInfo };
+
+// Dev helper: force a positions POST for the current screen
+;(function attachDevHelpers() {
+  try {
+    const win: any = window as any;
+    win.AppStorysForceIdentifyPositions = async (screenName?: string) => {
+      const s = useAppStorysStore.getState();
+      const name = screenName || s.currentScreen;
+      if (!name) {
+        console.warn('AppStorys: AppStorysForceIdentifyPositions - no screen name available');
+        return;
+      }
+      const data = CaptureService.getLayoutData(name) || [];
+      const positions = data.map(d => normalizeWidgetId(d.id)).filter((v): v is string => !!v);
+      console.info('AppStorys: AppStorysForceIdentifyPositions sending', positions.length, 'positions for', name, positions);
+      try {
+        await identifyWidgetPositions(name, positions);
+        console.info('AppStorys: AppStorysForceIdentifyPositions completed');
+      } catch (err) {
+        console.error('AppStorys: AppStorysForceIdentifyPositions error', err);
+      }
+    };
+  } catch (e) {
+    /* ignore */
+  }
+})();
