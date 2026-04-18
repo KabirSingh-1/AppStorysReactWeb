@@ -67,16 +67,23 @@ export const ImageQuizSticker: React.FC<StickerProps<ImageQuizStickerData>> = ({
   const handleOptionClick = (optionId: string) => {
     if (isEditing || selectedOptionId) return;
     setSelectedOptionId(optionId);
-    onInteraction?.({ type: 'image_quiz_answer', quizId: data.id, optionId: optionId });
+    onInteraction?.({
+      type: 'image',
+      quizId: data.id,
+      optionId: optionId,
+      stickerId: data.id
+    });
   };
 
   const placeholderImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100%25' height='100%25' fill='%23EDF2F7'/%3E%3Cpath d='M30 40 L40 30 L50 40 L60 30 L70 40 V60 H30 Z' fill='%23A0AEC0'/%3E%3Ccircle cx='40' cy='45' r='5' fill='%23FFFFFF'/%3E%3C/svg%3E";
+
+  const options = Array.isArray(data.options) ? data.options : [];
 
   return (
     <div style={containerStyle}>
       {data.question && <h3 style={questionStyle}>{data.question}</h3>}
       <div style={gridStyle}>
-        {data.options.map((option) => {
+        {options.map((option) => {
           const isSelected = option.id === selectedOptionId;
           const isCorrect = (option as any).isCorrect === true;
 
@@ -121,7 +128,7 @@ export const ImageQuizSticker: React.FC<StickerProps<ImageQuizStickerData>> = ({
                   alt={option.text}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
-                
+
                 {selectedOptionId && (
                   <div style={{
                     position: 'absolute',
