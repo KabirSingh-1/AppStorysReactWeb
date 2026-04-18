@@ -29,6 +29,10 @@ export interface PollStickerData extends BaseStickerData {
   type: 'poll';
   question: string;
   options: PollOption[];
+  layout?: {
+    type: 'vertical' | 'horizontal';
+    columns?: number;
+  };
   styling?: BaseStickerData['styling'] & {
     headerColor?: string;
     headerTextColor?: string;

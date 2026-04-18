@@ -57,7 +57,12 @@ export const QuestionSticker: React.FC<StickerProps<QuestionStickerData>> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isEditing) return;
-    onInteraction?.({ type: 'question_type', questionId: data.id, value: e.target.value });
+    onInteraction?.({
+      type: 'question',
+      questionId: data.id,
+      value: e.target.value,
+      stickerId: data.id
+    });
   };
 
   return (

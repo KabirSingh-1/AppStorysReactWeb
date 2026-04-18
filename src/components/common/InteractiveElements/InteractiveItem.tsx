@@ -44,6 +44,7 @@ export const InteractiveItem: React.FC<InteractiveItemProps> = ({
     boxSizing: 'border-box',
     cursor: isEditing ? 'move' : 'default',
     pointerEvents: 'auto', // override any transparent overlay issues
+    animation: (data as any).styling?.animation,
   };
 
   const renderSticker = () => {

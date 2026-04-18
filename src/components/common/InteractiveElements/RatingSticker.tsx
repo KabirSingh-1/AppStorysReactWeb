@@ -28,34 +28,36 @@ export const RatingSticker: React.FC<StickerProps<RatingStickerData>> = ({
     backgroundColor: styling.backgroundColor || defaults.backgroundColor,
     borderRadius: `${styling.borderRadius ?? defaults.borderRadius}px`,
     padding: `${styling.padding ?? defaults.padding}px`,
-    boxShadow: styling.shadow || '0 8px 16px rgba(0,0,0,0.08)',
+    boxShadow: styling.shadow || '0 12px 30px rgba(0,0,0,0.08)',
     boxSizing: 'border-box',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '16px',
+    gap: '20px',
     cursor: 'default',
+    opacity: styling.opacity ?? 1,
   };
 
   const titleStyle: React.CSSProperties = {
     color: styling.titleColor || defaults.titleColor,
-    fontWeight: '800',
+    fontWeight: '900',
     fontSize: `${styling.titleFontSize || defaults.titleFontSize}px`,
     margin: '0',
     textAlign: 'center',
-    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    width: '100%',
   };
 
   const trackStyle: React.CSSProperties = {
     width: '100%',
-    height: '14px',
+    height: '18px',
     backgroundColor: styling.sliderTrackColor || defaults.sliderTrackColor,
-    borderRadius: '7px',
+    borderRadius: '100px',
     position: 'relative',
     cursor: isEditing ? 'default' : 'pointer',
-    marginTop: '32px', // Space for emoji thumb
-    marginBottom: '12px',
+    marginTop: '24px', 
+    marginBottom: '8px',
     userSelect: 'none',
   };
 
@@ -64,8 +66,8 @@ export const RatingSticker: React.FC<StickerProps<RatingStickerData>> = ({
   const fillStyle: React.CSSProperties = {
     width: `${percentage}%`,
     height: '100%',
-    background: styling.sliderFillColor || 'linear-gradient(90deg, #d946ef, #F97316)',
-    borderRadius: '7px',
+    background: styling.sliderFillColor || 'linear-gradient(90deg, #FF4582, #e11d48)',
+    borderRadius: '100px',
     transition: isDragging ? 'none' : 'width 0.1s ease',
   };
 
@@ -73,11 +75,12 @@ export const RatingSticker: React.FC<StickerProps<RatingStickerData>> = ({
   const thumbStyle: React.CSSProperties = {
     position: 'absolute',
     left: `calc(${percentage}% - ${emojiSize / 2}px)`,
-    top: `-${emojiSize / 2 - 7}px`, // center emoji on track
+    top: `-${emojiSize / 4}px`, 
     fontSize: `${emojiSize}px`,
     userSelect: 'none',
     cursor: 'grab',
     transition: isDragging ? 'none' : 'left 0.1s ease',
+    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
   };
 
   const handleDrag = (clientX: number) => {
@@ -112,7 +115,12 @@ export const RatingSticker: React.FC<StickerProps<RatingStickerData>> = ({
     const onMouseUp = () => {
       if (isDragging) {
         setIsDragging(false);
-        onInteraction?.({ type: 'rating_submit', ratingId: data.id, value: val });
+        onInteraction?.({
+          type: 'rating',
+          ratingId: data.id,
+          value: val,
+          stickerId: data.id
+        });
       }
     };
 

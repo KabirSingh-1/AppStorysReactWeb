@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Story as StoryType, StorySlide } from '../../types';
 import trackEvent from '../../core/trackEvent';
+import useAppStorysStore, { getAccessToken } from '../../core/store';
 import { InteractiveOverlay } from '../common/InteractiveElements/InteractiveOverlay';
 import { StickerData } from '../common/InteractiveElements/types';
 import PlayPauseButton from '../common/CommonElements/PlayPauseButton';
@@ -8,6 +9,7 @@ import Cta from '../common/CommonElements/Cta';
 import CrossButton from '../common/CommonElements/CrossButton';
 import { SoundButton } from '../common/CommonElements/SoundButton';
 import ShareButton from '../common/CommonElements/ShareButton';
+import { parseBackground } from '../../utils/styleUtils';
 
 interface StoryOverlayProps {
   stories: StoryType[];
@@ -653,13 +655,13 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
           <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: '70%', zIndex: 4, cursor: 'pointer' }} onMouseDown={handleMouseDownNav} onMouseUp={() => handleMouseUpNav('next')} onTouchStart={handleMouseDownNav} onTouchEnd={() => handleMouseUpNav('next')} />
 
           {(() => {
-            const bgColor = currentSlideStyling?.background?.color?.solid || '#000000';
+            const bgColor = parseBackground(currentSlideStyling?.background) || '#000000';
 
             const containerStyles: React.CSSProperties = {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: slideIsStudio ? bgColor : '#000',
+              background: slideIsStudio ? bgColor : '#000',
               position: 'relative',
               width: '100%',
               maxHeight: isDesktop ? 'none' : '100%',
@@ -682,7 +684,54 @@ export const StoryOverlay: React.FC<StoryOverlayProps> = ({
                     />
                   )
                 )}
-                <InteractiveOverlay content={{ ...currentSlide.content, interactions: currentSlide.interactions }} />
+                <InteractiveOverlay
+                  content={{ ...currentSlide.content, interactions: currentSlide.interactions }}
+                  onInteraction={async (interactionData: any) => {
+                    setIsPaused(true); // Instant pause on interaction
+                    const { type, questionId, pollId, quizId, optionId, value, stickerId } = interactionData;
+
+                    // Determine interaction type and ID
+                    let interaction_type = type?.split('_')[0] || 'interaction';
+                    if (interaction_type === 'quizz') interaction_type = 'quiz';
+                    if (type?.startsWith('image_quiz')) interaction_type = 'quiz';
+
+                    const interaction_id = stickerId || questionId || pollId || quizId || currentSlide.id;
+                    const selected = optionId || interactionData.selected_option || '';
+
+                    // Get data from store instantly
+                    const state = useAppStorysStore.getState();
+                    const userId = state.userId || 'anonymous';
+                    const trackingUrl = state.trackingUrl || 'https://tracking.appstorys.co';
+                    const accessToken = await getAccessToken();
+
+                    // Construct exact payload as per user request
+                    const payload = {
+                      user_id: userId,
+                      campaign_id: dataId,
+                      event: 'interaction',
+                      metadata: {
+                        interaction_type,
+                        interaction_id,
+                        slide_id: currentSlide.id,
+                        selected_option: String(selected),
+                        value: String(value || '')
+                      }
+                    };
+
+                    // Instant call - non-blocking
+                    fetch(`${trackingUrl}/capture-event`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+                      },
+                      body: JSON.stringify(payload)
+                    }).catch(err => console.error('AppStorys: Instant Tracking Failed', err));
+
+                    // Also call trackEvent in background for reliability/state syncing if needed
+                    // but we focus on the instant fetch above
+                  }}
+                />
               </div>
             );
           })()}
